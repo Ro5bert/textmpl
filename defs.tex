@@ -1,10 +1,13 @@
 \catcode`@=11
 
 % PARAMETERS
+
 \parskip=\smallskipamount
 \parindent=0pt
 
+
 % SHORTCUTS
+
 \let\ea=\expandafter
 \let\:=\colon
 \let\dsty=\displaystyle
@@ -12,7 +15,9 @@
 \let\ssty=\scriptstyle
 \let\sssty=\scriptscriptstyle
 
+
 % FONTS
+
 \font\ftitle=cmbx10 scaled \magstep2
 \font\fprobtitle=cmbx10 scaled \magstep1
 \font\fprobdesc=cmsl10 at 9pt
@@ -42,7 +47,9 @@
 \skewchar\sevenmbf='177
 \skewchar\fivembf='177
 
+
 % MACROS
+
 \def\1#1#2{#1} % I.e., firstoftwo
 \def\2#1#2{#2} % I.e., secondoftwo
 
@@ -84,12 +91,12 @@
 
 % https://www.tug.org/TUGboat/tb22-4/tb72perlS.pdf
 \def\clap#1{\hbox to 0pt{\hss#1\hss}}
-\def\mathllap{\mathpalette\mathllapinternal}
-\def\mathrlap{\mathpalette\mathrlapinternal}
-\def\mathclap{\mathpalette\mathclapinternal}
-\def\mathllapinternal#1#2{\llap{$\mathsurround=0pt#1{#2}$}}
-\def\mathrlapinternal#1#2{\rlap{$\mathsurround=0pt#1{#2}$}}
-\def\mathclapinternal#1#2{\clap{$\mathsurround=0pt#1{#2}$}}
+\def\mathllap{\mathpalette\@mathllapinternal}
+\def\mathrlap{\mathpalette\@mathrlapinternal}
+\def\mathclap{\mathpalette\@mathclapinternal}
+\def\@mathllapinternal#1#2{\llap{$\mathsurround=0pt#1{#2}$}}
+\def\@mathrlapinternal#1#2{\rlap{$\mathsurround=0pt#1{#2}$}}
+\def\@mathclapinternal#1#2{\clap{$\mathsurround=0pt#1{#2}$}}
 
 % mappalette is like mathpalette, except instead of the first argument to the
 % given CS being the current math style, it is whatever the given mapfour maps
@@ -107,9 +114,9 @@
 		\setbox0=\box1 \setbox1=\box2 \setbox2=\box0
 	\fi
 	\hbox to \wd1{\hfil\unhbox2\hfil}\llap{\unhbox1}}}
-\def\msupimpinternal#1#2{%
+\def\@msupimpinternal#1#2{%
 	\supimp{$\mathsurround=0pt \1#1\1#2$}{$\mathsurround=0pt \2#1\2#2$}}
-\def\msupimpmap#1#2#3{\mappalette{#1}\msupimpinternal{{#2}{#3}}}
+\def\msupimpmap#1#2#3{\mappalette{#1}\@msupimpinternal{{#2}{#3}}}
 \def\msupimp{\msupimpmap
 	{\mapfour{\dsty\dsty}{\tsty\tsty}{\ssty\ssty}{\sssty\sssty}}}
 
