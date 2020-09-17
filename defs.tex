@@ -1,0 +1,142 @@
+\catcode`@=11
+
+% PARAMETERS
+\parskip=\smallskipamount
+\parindent=0pt
+
+% SHORTCUTS
+\let\ea=\expandafter
+\let\:=\colon
+\let\dsty=\displaystyle
+\let\tsty=\textstyle
+\let\ssty=\scriptstyle
+\let\sssty=\scriptscriptstyle
+
+% FONTS
+\font\ftitle=cmbx10 scaled \magstep2
+\font\fprobtitle=cmbx10 scaled \magstep1
+\font\fprobdesc=cmsl10 at 9pt
+
+\def\loadfont#1#2#3#4#5{%
+	\ea\font\csname ten#1\endcsname=#2
+	\ea\font\csname seven#1\endcsname=#3
+	\ea\font\csname five#1\endcsname=#4
+	\ea\textfont\ea#5\ea=\csname ten#1\endcsname
+	\ea\scriptfont\ea#5\ea=\csname seven#1\endcsname
+	\ea\scriptscriptfont\ea#5\ea=\csname five#1\endcsname
+	\ea\def\csname #1\endcsname{\fam#5}}
+
+\newfam\bbfam
+\loadfont{bb}{msbm10}{msbm7}{msbm5}\bbfam
+
+\newfam\scrfam
+\loadfont{scr}{stix-mathscr at 10pt}{stix-mathscr at 7pt}%
+	{stix-mathscr at 5pt}\scrfam
+
+\newfam\eucalfam
+\loadfont{eucal}{eusm10}{eusm7}{eusm5}\eucalfam
+
+\newfam\mbffam
+\loadfont{mbf}{cmmib10}{cmmib7}{cmmib5}\mbffam
+\skewchar\tenmbf='177
+\skewchar\sevenmbf='177
+\skewchar\fivembf='177
+
+% MACROS
+\def\1#1#2{#1} % I.e., firstoftwo
+\def\2#1#2{#2} % I.e., secondoftwo
+
+\def\hugeskip{\vskip 24pt plus 8pt\relax}
+
+% Logic
+\def\lxor{\oplus}
+\def\limp{\rightarrow}
+\def\Limp{\Rightarrow}
+\def\liff{\leftrightarrow}
+\def\Liff{\Leftrightarrow}
+
+% Sets
+\def\N{{\bb N}}
+\def\Z{{\bb Z}}
+\def\Q{{\bb Q}}
+\def\R{{\bb R}}
+\def\powset{{\scr P}}
+
+% Big O and friends
+% bigomega and bigtheta are upright, so bigo should be too, hence eucal
+% (but not just a roman O, since it looks too much like zero).
+% \Omega and \Theta are class 7, so make sure they get typeset in \rm.
+% \omega is class 0, so no worries there.
+\def\bigo{{\eucal O}}
+\def\littleo{{\mit o}}
+\def\bigomega{{\rm \Omega}}
+\def\littleomega{\omega}
+\def\bigtheta{{\rm \Theta}}
+
+\def\ihat{{\bf\mathaccent"705E \mathchar"7010}}
+\def\jhat{{\bf\mathaccent"705E \mathchar"7011}}
+\def\khat{{\bf\mathaccent"705E k}}
+
+\def\?{\mathrel{\mathop=\limits^?}}
+\def\d{{\rm d}} % For dx in integrals, etc. Preceed with \, after \int.
+\def\falling#1#2{#1^{\underline{#2}}}
+\def\rising#1#2{#1^{\overline{#2}}}
+
+% https://www.tug.org/TUGboat/tb22-4/tb72perlS.pdf
+\def\clap#1{\hbox to 0pt{\hss#1\hss}}
+\def\mathllap{\mathpalette\mathllapinternal}
+\def\mathrlap{\mathpalette\mathrlapinternal}
+\def\mathclap{\mathpalette\mathclapinternal}
+\def\mathllapinternal#1#2{\llap{$\mathsurround=0pt#1{#2}$}}
+\def\mathrlapinternal#1#2{\rlap{$\mathsurround=0pt#1{#2}$}}
+\def\mathclapinternal#1#2{\clap{$\mathsurround=0pt#1{#2}$}}
+
+% mappalette is like mathpalette, except instead of the first argument to the
+% given CS being the current math style, it is whatever the given mapfour maps
+% the current math style to.
+\def\mapfour#1#2#3#4#5{\ifcase #5 #1\or #2\or #3\or #4\fi}
+\def\mappalette#1#2#3{\mathchoice
+	{\edef\@arg{#10}\ea#2\ea{\@arg}{#3}}{\edef\@arg{#11}\ea#2\ea{\@arg}{#3}}
+	{\edef\@arg{#12}\ea#2\ea{\@arg}{#3}}{\edef\@arg{#13}\ea#2\ea{\@arg}{#3}}}
+
+% Superimposition
+\def\supimp#1#2{{%
+	\leavevmode
+	\setbox1=\hbox{#1}\setbox2=\hbox{#2}
+	\ifdim\wd1<\wd2
+		\setbox0=\box1 \setbox1=\box2 \setbox2=\box0
+	\fi
+	\hbox to \wd1{\hfil\unhbox2\hfil}\llap{\unhbox1}}}
+\def\msupimpinternal#1#2{%
+	\supimp{$\mathsurround=0pt \1#1\1#2$}{$\mathsurround=0pt \2#1\2#2$}}
+\def\msupimpmap#1#2#3{\mappalette{#1}\msupimpinternal{{#2}{#3}}}
+\def\msupimp{\msupimpmap
+	{\mapfour{\dsty\dsty}{\tsty\tsty}{\ssty\ssty}{\sssty\sssty}}}
+
+\long\def\problem#1\par#2\endproblem{{%
+	\par\vfil\penalty0\vfilneg\bigskip
+	\hbox{\fprobtitle #1}%
+	\nobreak\medskip
+	\setbox0=\vbox{
+		\advance \hsize by -30pt
+		\fprobdesc\noindent #2}%
+	\dimen0=\ht0
+	\dimen1=\dp0
+	\advance \dimen0 by 2pt
+	\advance \dimen1 by 2pt
+	\hbox to \hsize{
+		\hfil
+		\vrule height \dimen0 depth \dimen1
+		\hskip 5pt
+		\box0
+		\hskip 5.4pt plus 1fil}
+	\penalty25\smallskip}}
+
+% Spread tokens in #1 by glue in #2.
+\def\spread#1#2{{%
+	\def\endhelp##1\help{}
+	\def\help##1{##1\hskip#2\relax\help}
+	\help#1\endhelp\unskip}}
+
+\catcode`@=11
+\endinput
