@@ -1,66 +1,191 @@
 \catcode`@=11
+% TODO allocate registers for temporary use
+
+\def\supershowlists{{\showboxdepth=1000 \showboxbreadth=1000000 \showlists}}
 
 % PARAMETERS
 
-\parskip=\smallskipamount
+% If changing \parindent, one may want to reconsider the skips used in
+% \problem so that the problem description indent matches the parindent.
 \parindent=0pt
-
-
-% SHORTCUTS
-
-\let\ea=\expandafter
-\let\:=\colon
-\let\dsty=\displaystyle
-\let\tsty=\textstyle
-\let\ssty=\scriptstyle
-\let\sssty=\scriptscriptstyle
+\parskip=\smallskipamount
 
 
 % FONTS
 
-\font\ftitle=cmbx10 scaled \magstep2
-\font\fprobtitle=cmbx10 scaled \magstep1
-\font\fprobdesc=cmsl10 at 9pt
+% We use 10/7/5 for normal text, and 9/6/5 for problem statement text.
+% Little/no effort has been made to make sure math symbols work properly with
+% non-standard fonts (but the Latin/Greek letters should work fine).
+% Plain TeX default fams, for reference:
+%  0 = rm             (10/7/5)
+%  1 = math it        (10/7/5)
+%  2 = math symbols   (10/7/5)
+%  3 = math extension (10/10/10)
+%  4 = text it        (10//)
+%  5 = sl             (10//)
+%  6 = bf             (10/7/5)
+%  7 = tt             (10//)
 
-\def\loadfont#1#2#3#4#5{%
-	\ea\font\csname ten#1\endcsname=#2
-	\ea\font\csname seven#1\endcsname=#3
-	\ea\font\csname five#1\endcsname=#4
-	\ea\textfont\ea#5\ea=\csname ten#1\endcsname
-	\ea\scriptfont\ea#5\ea=\csname seven#1\endcsname
-	\ea\scriptscriptfont\ea#5\ea=\csname five#1\endcsname
-	\ea\def\csname #1\endcsname{\fam#5}}
+% Misc fonts
+\font\bigbf=cmbx12 scaled \magstep1 % Title.
+\font\twelvebf=cmbx12 % Problem headings.
 
+\font\ninerm=cmr9
+\font\sixrm=cmr6
+
+\font\ninei=cmmi9 \skewchar\ninei='177
+\font\sixi=cmmi6  \skewchar\sixi='177
+
+\font\ninesy=cmsy9 \skewchar\ninesy='60
+\font\sixsy=cmsy6  \skewchar\sixsy='60
+
+\font\nineit=cmti9
+
+\font\ninesl=cmsl9
+
+\font\ninebf=cmbx9
+\font\sixbf=cmbx6
+
+\font\ninett=cmtt9
+
+\font\tensc=cmcsc10
+\font\ninesc=cmcsc9
+
+\font\tenss=cmss10
+\font\niness=cmss9
+% \font\sevenss=cmss7
+% \font\sixss=cmss6
+% \font\fivess=cmss5
+
+\font\tenbb=msbm10
+\font\ninebb=msbm9
+\font\sevenbb=msbm7
+\font\sixbb=msbm6
+\font\fivebb=msbm5
+
+\font\tenscr=stix-mathscr at 10pt
+\font\ninescr=stix-mathscr at 9pt
+\font\sevenscr=stix-mathscr at 7pt
+\font\sixscr=stix-mathscr at 6pt
+\font\fivescr=stix-mathscr at 5pt
+
+\font\teneucal=eusm10
+\font\nineeucal=eusm9
+\font\seveneucal=eusm7
+\font\sixeucal=eusm6
+\font\fiveeucal=eusm5
+
+\font\tenbmit=cmmib10  \skewchar\tenbmit='177
+\font\ninebmit=cmmib9  \skewchar\ninebmit='177
+\font\sevenbmit=cmmib7 \skewchar\sevenbmit='177
+\font\sixbmit=cmmib6   \skewchar\sixbmit='177
+\font\fivebmit=cmmib5  \skewchar\fivebmit='177
+
+\newfam\scfam
+\newfam\ssfam
 \newfam\bbfam
-\loadfont{bb}{msbm10}{msbm7}{msbm5}\bbfam
-
 \newfam\scrfam
-\loadfont{scr}{stix-mathscr at 10pt}{stix-mathscr at 7pt}%
-	{stix-mathscr at 5pt}\scrfam
-
 \newfam\eucalfam
-\loadfont{eucal}{eusm10}{eusm7}{eusm5}\eucalfam
+\newfam\bmitfam
 
-\newfam\mbffam
-\loadfont{mbf}{cmmib10}{cmmib7}{cmmib5}\mbffam
-\skewchar\tenmbf='177
-\skewchar\sevenmbf='177
-\skewchar\fivembf='177
+\def\initfam#1#2#3#4{%
+	\textfont#1=#2%
+	\scriptfont#1=#3%
+	\scriptscriptfont#1=#4}
+
+% These 4 switches, along with \mit (fam1) and \cal (fam2) don't change
+% the current font, only the fam, so they don't need to be redefed in \tenpt
+% or \ninept.
+\def\bb{\fam=\bbfam}
+\def\scr{\fam=\scrfam}
+\def\eucal{\fam=\eucalfam}
+\def\bmit{\fam=\bmitfam}
+
+\def\tenpt{%
+	\initfam0\tenrm\sevenrm\fiverm
+	\initfam1\teni\seveni\fivei
+	\initfam2\tensy\sevensy\fivesy
+	\initfam\itfam\tenit\nullfont\nullfont
+	\initfam\slfam\tensl\nullfont\nullfont
+	\initfam\bffam\tenbf\sevenbf\fivebf
+	\initfam\ttfam\tentt\nullfont\nullfont
+	\initfam\scfam\tensc\nullfont\nullfont
+	\initfam\ssfam\tenss\nullfont\nullfont
+	\initfam\bbfam\tenbb\sevenbb\fivebb
+	\initfam\scrfam\tenscr\sevenscr\fivescr
+	\initfam\eucalfam\teneucal\seveneucal\fiveeucal
+	\initfam\bmitfam\tenbmit\sevenbmit\fivebmit
+	\def\rm{\fam=0      \tenrm}%
+	\def\it{\fam=\itfam \tenit}%
+	\def\sl{\fam=\slfam \tensl}%
+	\def\bf{\fam=\bffam \tenbf}%
+	\def\tt{\fam=\ttfam \tentt}%
+	\def\sc{\fam=\scfam \tensc}%
+	\def\ss{\fam=\ssfam \tenss}%
+	\setbox\strutbox=\hbox{\vrule height8.5pt depth3.5pt width0pt}%
+	\normalbaselineskip=12pt
+	\normalbaselines\rm}
+
+\def\ninept{%
+	\initfam0\ninerm\sixrm\fiverm
+	\initfam1\ninei\sixi\fivei
+	\initfam2\ninesy\sixsy\fivesy
+	\initfam\itfam\nineit\nullfont\nullfont
+	\initfam\slfam\ninesl\nullfont\nullfont
+	\initfam\bffam\ninebf\sixbf\fivebf
+	\initfam\ttfam\ninett\nullfont\nullfont
+	\initfam\scfam\ninesc\nullfont\nullfont
+	\initfam\ssfam\niness\nullfont\nullfont
+	\initfam\bbfam\ninebb\sixbb\fivebb
+	\initfam\scrfam\ninescr\sixscr\fivescr
+	\initfam\eucalfam\nineeucal\sixeucal\fiveeucal
+	\initfam\bmitfam\ninebmit\sixbmit\fivebmit
+	\def\rm{\fam=0      \ninerm}%
+	\def\it{\fam=\itfam \nineit}%
+	\def\sl{\fam=\slfam \ninesl}%
+	\def\bf{\fam=\bffam \ninebf}%
+	\def\tt{\fam=\ttfam \ninett}%
+	\def\sc{\fam=\scfam \ninesc}%
+	\def\ss{\fam=\ssfam \niness}%
+	\setbox\strutbox=\hbox{\vrule height8pt depth3pt width0pt}%
+	\normalbaselineskip=11pt
+	\normalbaselines\rm}
+
+\tenpt
 
 
-% MACROS
+% MACROS/ASSIGNMENTS
 
 \def\1#1#2{#1} % I.e., firstoftwo
 \def\2#1#2{#2} % I.e., secondoftwo
 
-\def\hugeskip{\vskip 24pt plus 8pt\relax}
+% Shortcuts
+\let\ea=\expandafter
+\let\dsty=\displaystyle
+\let\tsty=\textstyle
+\let\ssty=\scriptstyle
+\let\sssty=\scriptscriptstyle
+\let\lc=\lceil
+\let\rc=\rceil
+\let\lf=\lfloor
+\let\rf=\rfloor
 
-% Logic
-\def\lxor{\oplus}
-\def\limp{\rightarrow}
-\def\Limp{\Rightarrow}
-\def\liff{\leftrightarrow}
-\def\Liff{\Leftrightarrow}
+% Alternate names
+\let\:=\colon % Punctuation colon. Regular colon is a relation.
+\let\lxor=\oplus
+\let\limp=\rightarrow
+\let\liff=\leftrightarrow
+\let\grad=\nabla
+
+\def\imp{\;\Longrightarrow\;} % \imp to match \iff.
+
+\newskip\hugeskipamount \hugeskipamount=24pt plus8pt minus8pt
+\def\hugeskip{\vskip\hugeskipamount}
+\def\xvskip#1{\par\ifdim\lastskip<#1\removelastskip\vskip#1\fi}
+\def\xsmallskip{\xvskip\smallskipamount}
+\def\xmedskip{\xvskip\medskipamount}
+\def\xbigskip{\xvskip\bigskipamount}
+\def\xhugeskip{\xvskip\hugeskipamount}
 
 % Sets
 \def\N{{\bb N}}
@@ -85,9 +210,16 @@
 \def\khat{{\bf\mathaccent"705E k}}
 
 \def\?{\mathrel{\mathop=\limits^?}}
-\def\d{{\rm d}} % For dx in integrals, etc. Preceed with \, after \int.
+\def\d{{\rm d}} % For dx in integrals, etc. Preceed with \, usually.
 \def\falling#1#2{#1^{\underline{#2}}}
 \def\rising#1#2{#1^{\overline{#2}}}
+\def\rect#1#2#3{% inner width, inner height, line thickness 
+	\vcenter{\vbox{%
+		\hrule height#3
+		\hbox{\vrule width#3 height#2 \kern#1 \vrule width#3}%
+		\hrule height#3}}}
+\def\qedbox{\rect{5pt}{5pt}{0.5pt}}
+\def\qed{\unskip\hskip0.5em plus1fil \hbox{}\nobreak\hfill$\qedbox$\par}
 
 % https://www.tug.org/TUGboat/tb22-4/tb72perlS.pdf
 \def\clap#1{\hbox to 0pt{\hss#1\hss}}
@@ -109,7 +241,7 @@
 % Superimposition
 \def\supimp#1#2{{%
 	\leavevmode
-	\setbox1=\hbox{#1}\setbox2=\hbox{#2}
+	\setbox1=\hbox{#1}\setbox2=\hbox{#2}%
 	\ifdim\wd1<\wd2
 		\setbox0=\box1 \setbox1=\box2 \setbox2=\box0
 	\fi
@@ -120,30 +252,201 @@
 \def\msupimp{\msupimpmap
 	{\mapfour{\dsty\dsty}{\tsty\tsty}{\ssty\ssty}{\sssty\sssty}}}
 
+% TODO: parameterize
 \long\def\problem#1\par#2\endproblem{{%
-	\par\vfil\penalty0\vfilneg\bigskip
-	\hbox{\fprobtitle #1}%
+	\par
+	\skip255=\lastskip
+	\ifdim\skip255<\bigskipamount\removelastskip\fi
+	\vskip 0pt plus100pt \penalty0 \vskip 0pt plus-100pt
+	\ifdim\skip255<\bigskipamount\bigskip\fi
+	\nointerlineskip\hbox{\twelvebf#1}%
 	\nobreak\medskip
-	\setbox0=\vbox{
-		\advance \hsize by -30pt
-		\fprobdesc\noindent #2}%
-	\dimen0=\ht0
-	\dimen1=\dp0
-	\advance \dimen0 by 2pt
-	\advance \dimen1 by 2pt
-	\hbox to \hsize{
+	\setbox0=\vbox{%
+		\advance \hsize by -32pt
+		\ninept\sl\noindent\strut#2\strut}%
+	\dimen0=\ht0 \advance \dimen0 by 2pt
+	\dimen1=\dp0 \advance \dimen1 by 2pt
+	\nointerlineskip\hbox to \hsize{%
 		\hfil
-		\vrule height \dimen0 depth \dimen1
+		\vrule height\dimen0 depth\dimen1
 		\hskip 5pt
 		\box0
-		\hskip 5.4pt plus 1fil}
-	\penalty25\smallskip}}
+		\hskip 5.4pt plus1fil}%
+	\nointerlineskip
+	\penalty25\medskip\vskip-\parskip}}
+
+\newdimen\item@indent \item@indent=20pt
+\let\itemitem=\undefined
+\def\item{\@item1}
+\def\iitem{\@item2}
+\def\iiitem{\@item3}
+\def\@item#1#2{%
+	\par \hangafter=0 \hangindent=#1\item@indent
+	\noindent\llap{\rm#2\enspace}\ignorespaces}
+
+% Loop over tokens in #1, inserting #2 after each one.
+\def\tokloop#1#2{{%
+	\def\@terminator##1\@help{}%
+	\def\@help##1{##1#2\@help}%
+	\@help#1\@terminator}}
 
 % Spread tokens in #1 by glue in #2.
-\def\spread#1#2{{%
-	\def\endhelp##1\help{}
-	\def\help##1{##1\hskip#2\relax\help}
-	\help#1\endhelp\unskip}}
+\def\spread#1#2{\tokloop{#1}{\hskip #2\relax}\unskip}
 
-\catcode`@=11
+\def\initverb{%
+	\catcode`\\=12 \catcode`\{=12
+	\catcode`\}=12 \catcode`\$=12
+	\catcode`\&=12 \catcode`\#=12
+	\catcode`\^=12 \catcode`\_=12
+	\catcode`\%=12 \catcode`\~=12
+	\obeyspaces\obeylines}
+\def\verb#1#2{\begingroup
+	#1% Arbitrary local initialization before catcodes change.
+	\initverb
+	\long\def\@verb##1#2{##1\endgroup}%
+	\@verb}
+
+% Zero pad a positive integer. E.g., \zeropad{000}{13} -> 013.
+% Idea from https://tex.stackexchange.com/a/412225/202281.
+\def\zeropad#1#2{{%
+	\ifnum1#1>1#2%
+		\zeropad{#1}{0#2}%
+	\else
+		#2%
+	\fi}}
+
+% From the TeXBook TOC.
+\def\diamondleaders{%
+	\ifodd\pc@lineno \kern-10pt \fi
+	\leaders\hbox to 20pt{%
+		\ifodd\pc@lineno \kern15pt \else \kern5pt \fi $\cdot$\hss}}
+
+% Same as plain raggedright, but 2em -> 3em, and it advances rightskip,
+% instead of setting it.
+\def\raggedright{%
+	\advance \rightskip by 0pt plus 3em
+	\spaceskip=0.3333em \xspaceskip=0.5em\relax}
+
+% TODO alignment support
+\newcount\pc@stmtpenalty  \pc@stmtpenalty=100
+\newcount\pc@clubpenalty  \pc@clubpenalty=250
+\newcount\pc@widowpenalty \pc@widowpenalty=250
+\newcount\pc@interpenalty \pc@interpenalty=10000
+\newcount\pc@penalty
+\newcount\pc@lineno
+\newdimen\pc@hang         \pc@hang=30pt
+\newdimen\pc@indent       \pc@indent=20pt
+\newdimen\pc@rulewd
+\newskip\pc@kwskip        \pc@kwskip=0.5em
+\newskip\pc@sideskip      \pc@sideskip=20pt
+\newbox\pc@comment
+\def\pc@linenofmt{00}
+\def\beginpcode{%
+	\par\begingroup
+	\parskip=0pt
+	\advance \leftskip by \pc@sideskip
+	\advance \rightskip by \pc@sideskip
+	\raggedright
+	\clubpenalty=0 \widowpenalty=0
+	\interlinepenalty=\pc@interpenalty
+	\hyphenpenalty=10000 \exhyphenpenalty=10000
+	\mathsurround=0pt
+	\everypar={\pc@state}%
+	\pc@penalty=0
+	\pc@lineno=0
+	\setbox0=\hbox{$\ssty\pc@linenofmt$}% Assume digits are all same width.
+	\parindent=\wd0
+	\advance \parindent by 0.75em% Distance from line numbers.
+	\setbox\pc@comment=\box\voidb@x
+	\pc@rulewd=\hsize
+	\advance \pc@rulewd by -\leftskip
+	\advance \pc@rulewd by -\rightskip
+	\advance \pc@rulewd by 4pt
+	\bigbreak\pc@dorule\kern2pt}
+\def\endpcode{%
+	\kern2pt \pc@dorule\bigbreak
+	\endgroup\vskip-\parskip}
+\def\pc@addpenalty#1{\advance \pc@penalty by #1}
+\def\pc@emitpenalty{%
+	\ifnum\pc@penalty>0
+		\penalty\pc@penalty
+		\pc@penalty=0
+	\fi}
+\def\pc@dorule{%
+	\nointerlineskip
+	\hbox to \hsize{%
+		\hss\hskip\leftskip
+		\vrule height0.4pt width\pc@rulewd
+		\hskip\rightskip\hss}%
+	\nointerlineskip}
+\def\pc@dokwskip{\hskip\pc@kwskip}
+\def\pc@enter{\advance \parindent by \pc@indent}
+\def\pc@exit{\advance \parindent by -\pc@indent}
+\def\pc@state#1;{%
+	\pc@emitpenalty
+	\hangafter=1
+	\hangindent=\parindent \advance \hangindent by \pc@hang
+	\advance \pc@lineno by 1
+	\llap{\hbox to \parindent{%
+		$\ssty\zeropad{\pc@linenofmt}{\number\pc@lineno}$\hss}}%
+	% The struts assure the surrounding rules are spaced well.
+	\strut#1\strut
+	\ifvoid\pc@comment\else
+		\nobreak\hfil\hbox{}\hskip0.5em plus1fil \hbox{}\nobreak\hfill
+		\box\pc@comment% pc@comment now void.
+	\fi
+	\par
+	\pc@addpenalty\pc@stmtpenalty}
+\def\State{\leavevmode}
+\def\Func#1(#2){%
+	\Kw{function}\pc@dokwskip\Name{#1}(#2);
+	\pc@addpenalty\pc@clubpenalty
+	\pc@enter}
+\def\If#1\Then{%
+	\Kw{if}\pc@dokwskip #1\unskip\pc@dokwskip\Kw{then};
+	\pc@addpenalty\pc@clubpenalty
+	\pc@enter}
+\def\Elseif#1\Then{%
+	\pc@exit
+	\pc@addpenalty\pc@widowpenalty
+	\Kw{elseif}\pc@dokwskip #1\unskip\pc@dokwskip\Kw{then};
+	\pc@addpenalty\pc@clubpenalty
+	\pc@enter}
+\def\Else{%
+	\pc@exit
+	\pc@addpenalty\pc@widowpenalty
+	\Kw{else};
+	\pc@addpenalty\pc@clubpenalty
+	\pc@enter}
+\def\For$#1$#2\From$#3$#4\To$#5$#6\Do{%
+	\Kw{for}\pc@dokwskip$#1 := #3 \to #5$\unskip\pc@dokwskip\Kw{do};
+	\pc@addpenalty\pc@clubpenalty
+	\pc@enter}
+\def\Foreach#1\In#2\Do{%
+	\Kw{foreach}\pc@dokwskip #1\unskip\pc@dokwskip
+	\Kw{in}\pc@dokwskip #2\unskip\pc@dokwskip\Kw{do};
+	\pc@addpenalty\pc@clubpenalty
+	\pc@enter}
+\def\While#1\Do{%
+	\Kw{while}\pc@dokwskip #1\unskip\pc@dokwskip\Kw{do};
+	\pc@addpenalty\pc@clubpenalty
+	\pc@enter}
+\def\End{%
+	\pc@exit
+	\pc@addpenalty\pc@widowpenalty
+	\Kw{end};}
+\def\Return{\Kw{return}\pc@dokwskip}
+\def\Kw#1{\leavevmode{\bf #1}}
+\def\Id#1{\leavevmode{\it #1}}
+\def\Name#1{\leavevmode{\sc #1}}
+\def\Call#1(#2){\leavevmode\hbox{\Name{#1}(#2)}}
+\def\And{\unskip\pc@dokwskip\Kw{and}\pc@dokwskip}
+\def\Or{\unskip\pc@dokwskip\Kw{or}\pc@dokwskip}
+\def\True{{\rm true}}
+\def\False{{\rm false}}
+\def\Comment#1{\setbox\pc@comment=\hbox{$\triangleright$ #1}}
+\def\Mark#1{\edef#1{\the\pc@lineno}}
+\def\Markg{\global\Mark}
+
+\catcode`@=12
 \endinput
