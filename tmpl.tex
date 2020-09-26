@@ -1,0 +1,28 @@
+\input defs
+
+\topglue 0.5in
+\centerline{\bigbf MATH 123: Assignment 1}
+\vskip 6pt
+\centerline{My Name}
+\vskip 3pt
+\centerline{1 Jan.\ 2020}
+\bigskip
+
+\problem Example Problem\par
+	Do something.
+\endproblem
+Example algorithm:
+
+\beginpcode
+\Func QuickSort($A$, $l$, $r$)
+	\If $l \geq r$ \Then
+		\Return;
+	\End
+	$m := \Call PartitionInPlace($A$, $l$, $r$)$;
+	\Call QuickSort($A$, l, m-1);
+	\Call QuickSort($A$, m+1, r);
+\End
+\endpcode
+
+\ifnum\pageno=1\nopagenumbers\fi
+\bye
