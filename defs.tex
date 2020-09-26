@@ -1,14 +1,32 @@
 \catcode`@=11
-% TODO allocate registers for temporary use
 
 \def\supershowlists{{\showboxdepth=1000 \showboxbreadth=1000000 \showlists}}
 
-% PARAMETERS
 
-% If changing \parindent, one may want to reconsider the skips used in
-% \problem so that the problem description indent matches the parindent.
+% PARAMETERS/REGISTER ALLOCATION
+
+% \parindent, prob@sidesize, item@indent, and pc@sideskip should
+% be kept in sync so that indentations look consistent.
+
 \parindent=0pt
 \parskip=\smallskipamount
+
+% TODO allocate registers for temporary use
+\newskip\hugeskipamount    \hugeskipamount=24pt plus8pt minus8pt
+\newdimen\prob@sidesize    \prob@sidesize=20pt
+\newdimen\prob@rulegap     \prob@rulegap=5pt
+\newdimen\prob@topskip     \prob@topskip=\bigskipamount
+\newdimen\item@indent      \item@indent=20pt
+\newcount\pc@topbotpenalty \pc@topbotpenalty=-200
+\newcount\pc@stmtpenalty   \pc@stmtpenalty=100
+\newcount\pc@clubpenalty   \pc@clubpenalty=250
+\newcount\pc@widowpenalty  \pc@widowpenalty=250
+\newcount\pc@interpenalty  \pc@interpenalty=10000
+\newdimen\pc@hang          \pc@hang=30pt
+\newdimen\pc@indent        \pc@indent=20pt
+\newdimen\pc@linenogap     \pc@linenogap=5pt
+\newskip\pc@sideskip       \pc@sideskip=20pt
+\newskip\pc@topbotskip     \pc@topbotskip=\bigskipamount
 
 
 % FONTS
@@ -177,15 +195,17 @@
 \let\liff=\leftrightarrow
 \let\grad=\nabla
 
-\def\imp{\;\Longrightarrow\;} % \imp to match \iff.
-
-\newskip\hugeskipamount \hugeskipamount=24pt plus8pt minus8pt
+% Vertical skips
 \def\hugeskip{\vskip\hugeskipamount}
-\def\xvskip#1{\par\ifdim\lastskip<#1\removelastskip\vskip#1\fi}
+\def\xpvskip#1#2{\par\ifdim\lastskip<#2\removelastskip\penalty#1\vskip#2\fi}
+\def\xvskip#1{\xpvskip0{#1}}
 \def\xsmallskip{\xvskip\smallskipamount}
 \def\xmedskip{\xvskip\medskipamount}
 \def\xbigskip{\xvskip\bigskipamount}
 \def\xhugeskip{\xvskip\hugeskipamount}
+
+% \imp to match \iff.
+\def\imp{\;\Longrightarrow\;}
 
 % Sets
 \def\N{{\bb N}}
@@ -239,6 +259,8 @@
 	{\edef\@arg{#12}\ea#2\ea{\@arg}{#3}}{\edef\@arg{#13}\ea#2\ea{\@arg}{#3}}}
 
 % Superimposition
+% This was mostly an excercise. This would probably
+% be better done with alignment macros like ooalign.
 \def\supimp#1#2{{%
 	\leavevmode
 	\setbox1=\hbox{#1}\setbox2=\hbox{#2}%
@@ -252,30 +274,28 @@
 \def\msupimp{\msupimpmap
 	{\mapfour{\dsty\dsty}{\tsty\tsty}{\ssty\ssty}{\sssty\sssty}}}
 
-% TODO: parameterize
+% TODO allow breaking problem statements across pages.
 \long\def\problem#1\par#2\endproblem{{%
 	\par
-	\skip255=\lastskip
-	\ifdim\skip255<\bigskipamount\removelastskip\fi
 	\vskip 0pt plus100pt \penalty0 \vskip 0pt plus-100pt
-	\ifdim\skip255<\bigskipamount\bigskip\fi
+	\vskip\prob@topskip
 	\nointerlineskip\hbox{\twelvebf#1}%
 	\nobreak\medskip
 	\setbox0=\vbox{%
-		\advance \hsize by -32pt
+		\advance \hsize by -2\prob@sidesize
 		\ninept\sl\noindent\strut#2\strut}%
 	\dimen0=\ht0 \advance \dimen0 by 2pt
 	\dimen1=\dp0 \advance \dimen1 by 2pt
 	\nointerlineskip\hbox to \hsize{%
 		\hfil
 		\vrule height\dimen0 depth\dimen1
-		\hskip 5pt
+		\hskip\prob@rulegap
 		\box0
-		\hskip 5.4pt plus1fil}%
+		\hskip\prob@rulegap
+		\hskip 0.4pt plus1fil}%
 	\nointerlineskip
 	\penalty25\medskip\vskip-\parskip}}
 
-\newdimen\item@indent \item@indent=20pt
 \let\itemitem=\undefined
 \def\item{\@item1}
 \def\iitem{\@item2}
@@ -284,14 +304,11 @@
 	\par \hangafter=0 \hangindent=#1\item@indent
 	\noindent\llap{\rm#2\enspace}\ignorespaces}
 
-% Loop over tokens in #1, inserting #2 after each one.
-\def\tokloop#1#2{{%
-	\def\@terminator##1\@help{}%
-	\def\@help##1{##1#2\@help}%
-	\@help#1\@terminator}}
-
 % Spread tokens in #1 by glue in #2.
-\def\spread#1#2{\tokloop{#1}{\hskip #2\relax}\unskip}
+\def\spread#1#2{%
+	\def\@terminator##1\@help{}%
+	\def\@help##1{##1\hskip#2\relax\@help}%
+	\@help#1\@terminator\unskip}
 
 \def\initverb{%
 	\catcode`\\=12 \catcode`\{=12
@@ -328,18 +345,10 @@
 	\spaceskip=0.3333em \xspaceskip=0.5em\relax}
 
 % TODO alignment support
-\newcount\pc@stmtpenalty  \pc@stmtpenalty=100
-\newcount\pc@clubpenalty  \pc@clubpenalty=250
-\newcount\pc@widowpenalty \pc@widowpenalty=250
-\newcount\pc@interpenalty \pc@interpenalty=10000
 \newcount\pc@penalty
 \newcount\pc@lineno
-\newdimen\pc@hang         \pc@hang=30pt
-\newdimen\pc@indent       \pc@indent=20pt
-\newdimen\pc@rulewd
-\newskip\pc@kwskip        \pc@kwskip=0.5em
-\newskip\pc@sideskip      \pc@sideskip=20pt
 \newbox\pc@comment
+\def\pc@kwskip{\hskip0.5em\relax}
 \def\pc@linenofmt{00}
 \def\beginpcode{%
 	\par\begingroup
@@ -352,19 +361,16 @@
 	\hyphenpenalty=10000 \exhyphenpenalty=10000
 	\mathsurround=0pt
 	\everypar={\pc@state}%
+	\setbox0=\hbox{$\ssty\pc@linenofmt$\kern\pc@linenogap}%
+	\parindent=\wd0
 	\pc@penalty=0
 	\pc@lineno=0
-	\setbox0=\hbox{$\ssty\pc@linenofmt$}% Assume digits are all same width.
-	\parindent=\wd0
-	\advance \parindent by 0.75em% Distance from line numbers.
 	\setbox\pc@comment=\box\voidb@x
-	\pc@rulewd=\hsize
-	\advance \pc@rulewd by -\leftskip
-	\advance \pc@rulewd by -\rightskip
-	\advance \pc@rulewd by 4pt
-	\bigbreak\pc@dorule\kern2pt}
+	\xpvskip\pc@topbotpenalty\pc@topbotskip
+	\pc@dorule\kern2pt}
 \def\endpcode{%
-	\kern2pt \pc@dorule\bigbreak
+	\kern2pt \pc@dorule
+	\xpvskip\pc@topbotpenalty\pc@topbotskip
 	\endgroup\vskip-\parskip}
 \def\pc@addpenalty#1{\advance \pc@penalty by #1}
 \def\pc@emitpenalty{%
@@ -375,11 +381,16 @@
 \def\pc@dorule{%
 	\nointerlineskip
 	\hbox to \hsize{%
-		\hss\hskip\leftskip
-		\vrule height0.4pt width\pc@rulewd
-		\hskip\rightskip\hss}%
+		\hskip\leftskip
+		\kern-2pt
+		\dimen255=\hsize
+		\advance \dimen255 by -\leftskip
+		\advance \dimen255 by -\rightskip
+		\advance \dimen255 by 4pt
+		\vrule height0.4pt width\dimen255
+		\kern-2pt
+		\hskip\rightskip}%
 	\nointerlineskip}
-\def\pc@dokwskip{\hskip\pc@kwskip}
 \def\pc@enter{\advance \parindent by \pc@indent}
 \def\pc@exit{\advance \parindent by -\pc@indent}
 \def\pc@state#1;{%
@@ -399,17 +410,17 @@
 	\pc@addpenalty\pc@stmtpenalty}
 \def\State{\leavevmode}
 \def\Func#1(#2){%
-	\Kw{function}\pc@dokwskip\Name{#1}(#2);
+	\Kw{function}\pc@kwskip\Name{#1}(#2);
 	\pc@addpenalty\pc@clubpenalty
 	\pc@enter}
 \def\If#1\Then{%
-	\Kw{if}\pc@dokwskip #1\unskip\pc@dokwskip\Kw{then};
+	\Kw{if}\pc@kwskip #1\unskip\pc@kwskip\Kw{then};
 	\pc@addpenalty\pc@clubpenalty
 	\pc@enter}
 \def\Elseif#1\Then{%
 	\pc@exit
 	\pc@addpenalty\pc@widowpenalty
-	\Kw{elseif}\pc@dokwskip #1\unskip\pc@dokwskip\Kw{then};
+	\Kw{elseif}\pc@kwskip #1\unskip\pc@kwskip\Kw{then};
 	\pc@addpenalty\pc@clubpenalty
 	\pc@enter}
 \def\Else{%
@@ -419,29 +430,29 @@
 	\pc@addpenalty\pc@clubpenalty
 	\pc@enter}
 \def\For$#1$#2\From$#3$#4\To$#5$#6\Do{%
-	\Kw{for}\pc@dokwskip$#1 := #3 \to #5$\unskip\pc@dokwskip\Kw{do};
+	\Kw{for}\pc@kwskip$#1 := #3 \to #5$\unskip\pc@kwskip\Kw{do};
 	\pc@addpenalty\pc@clubpenalty
 	\pc@enter}
 \def\Foreach#1\In#2\Do{%
-	\Kw{foreach}\pc@dokwskip #1\unskip\pc@dokwskip
-	\Kw{in}\pc@dokwskip #2\unskip\pc@dokwskip\Kw{do};
+	\Kw{foreach}\pc@kwskip #1\unskip\pc@kwskip
+	\Kw{in}\pc@kwskip #2\unskip\pc@kwskip\Kw{do};
 	\pc@addpenalty\pc@clubpenalty
 	\pc@enter}
 \def\While#1\Do{%
-	\Kw{while}\pc@dokwskip #1\unskip\pc@dokwskip\Kw{do};
+	\Kw{while}\pc@kwskip #1\unskip\pc@kwskip\Kw{do};
 	\pc@addpenalty\pc@clubpenalty
 	\pc@enter}
 \def\End{%
 	\pc@exit
 	\pc@addpenalty\pc@widowpenalty
 	\Kw{end};}
-\def\Return{\Kw{return}\pc@dokwskip}
+\def\Return{\Kw{return}\pc@kwskip}
 \def\Kw#1{\leavevmode{\bf #1}}
 \def\Id#1{\leavevmode{\it #1}}
 \def\Name#1{\leavevmode{\sc #1}}
 \def\Call#1(#2){\leavevmode\hbox{\Name{#1}(#2)}}
-\def\And{\unskip\pc@dokwskip\Kw{and}\pc@dokwskip}
-\def\Or{\unskip\pc@dokwskip\Kw{or}\pc@dokwskip}
+\def\And{\unskip\pc@kwskip\Kw{and}\pc@kwskip}
+\def\Or{\unskip\pc@kwskip\Kw{or}\pc@kwskip}
 \def\True{{\rm true}}
 \def\False{{\rm false}}
 \def\Comment#1{\setbox\pc@comment=\hbox{$\triangleright$ #1}}
