@@ -194,6 +194,7 @@
 \let\limp=\rightarrow
 \let\liff=\leftrightarrow
 \let\grad=\nabla
+\let\del=\partial
 
 % Vertical skips
 \def\hugeskip{\vskip\hugeskipamount}
@@ -283,6 +284,7 @@
 	\nobreak\medskip
 	\setbox0=\vbox{%
 		\advance \hsize by -2\prob@sidesize
+		\def\nostrut{\let\strut=\relax}%
 		\ninept\sl\noindent\strut#2\strut}%
 	\dimen0=\ht0 \advance \dimen0 by 2pt
 	\dimen1=\dp0 \advance \dimen1 by 2pt
