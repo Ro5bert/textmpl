@@ -1,6 +1,7 @@
 \catcode`@=11
 
-\def\supershowlists{{\showboxdepth=1000 \showboxbreadth=1000000 \showlists}}
+\def\supershowlists{\par
+	{\showboxdepth=1000 \showboxbreadth=1000000 \showlists}}
 
 
 % PARAMETERS/REGISTER ALLOCATION
@@ -306,6 +307,10 @@
 	\par \hangafter=0 \hangindent=#1\item@indent
 	\noindent\llap{\rm#2\enspace}\ignorespaces}
 
+\def\narrowerby#1{%
+	\advance \leftskip  by #1%
+	\advance \rightskip by #1}
+
 % Spread tokens in #1 by glue in #2.
 \def\spread#1#2{%
 	\def\@terminator##1\@help{}%
@@ -461,6 +466,9 @@
 \def\Comment#1{\setbox\pc@comment=\hbox{$\triangleright$ #1}}
 \def\Mark#1{\edef#1{\the\pc@lineno}}
 \def\Markg{\global\Mark}
+
+% Insert pdf image (PDFTex only).
+\def\pdfimg#1file #2.pdf{\pdfximage#1{#2.pdf}\pdfrefximage\pdflastximage}
 
 \catcode`@=12
 \endinput
