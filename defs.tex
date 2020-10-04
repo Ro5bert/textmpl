@@ -206,6 +206,23 @@
 \def\xbigskip{\xvskip\bigskipamount}
 \def\xhugeskip{\xvskip\hugeskipamount}
 
+% Disable parskip until the next paragraph.
+% Changes are local to group.
+\newskip\nps@oldparskip
+\def\noparskip{%
+	\ifx\nps@oldpar\@undefined
+		\let\nps@oldpar=\par
+		\nps@oldparskip=\parskip
+		\parskip=0pt
+		\def\par{%
+			\ifhmode
+				\parskip=\nps@oldparskip
+				\let\par=\nps@oldpar
+				\let\nps@oldpar=\@undefined
+				\par
+			\fi}%
+	\fi}
+
 % \imp to match \iff.
 \def\imp{\;\Longrightarrow\;}
 
@@ -277,16 +294,21 @@
 	{\mapfour{\dsty\dsty}{\tsty\tsty}{\ssty\ssty}{\sssty\sssty}}}
 
 % TODO allow breaking problem statements across pages.
-\long\def\problem#1\par#2\endproblem{{%
-	\par
+\def\problem#1\par{\@problem\prob@topskip{\twelvebf#1}}
+\def\subproblem#1\par{\@problem\prob@topskip{\tenbf#1}}
+\def\subproblemx#1\par{\@problem{0pt}{\tenbf#1}}
+\def\@problem#1#2{%
+	\par\begingroup
 	\vskip 0pt plus100pt \penalty0 \vskip 0pt plus-100pt
-	\vskip\prob@topskip
-	\nointerlineskip\hbox{\twelvebf#1}%
+	\vskip#1%
+	\nointerlineskip\hbox{#2}%
 	\nobreak\medskip
-	\setbox0=\vbox{%
+	\setbox0=\vbox\bgroup
 		\advance \hsize by -2\prob@sidesize
 		\def\nostrut{\let\strut=\relax}%
-		\ninept\sl\noindent\strut#2\strut}%
+		\ninept\sl\noindent\strut}
+\def\endproblem{%
+	\strut\egroup% End the vbox started in \@problem.
 	\dimen0=\ht0 \advance \dimen0 by 2pt
 	\dimen1=\dp0 \advance \dimen1 by 2pt
 	\nointerlineskip\hbox to \hsize{%
@@ -297,9 +319,10 @@
 		\hskip\prob@rulegap
 		\hskip 0.4pt plus1fil}%
 	\nointerlineskip
-	\penalty25\medskip\vskip-\parskip}}
+	\penalty25\medskip
+	\endgroup\noparskip}
 
-\let\itemitem=\undefined
+\let\itemitem=\@undefined
 \def\item{\@item1}
 \def\iitem{\@item2}
 \def\iiitem{\@item3}
@@ -378,7 +401,7 @@
 \def\endpcode{%
 	\kern2pt \pc@dorule
 	\xpvskip\pc@topbotpenalty\pc@topbotskip
-	\endgroup\vskip-\parskip}
+	\endgroup\noparskip}
 \def\pc@addpenalty#1{\advance \pc@penalty by #1}
 \def\pc@emitpenalty{%
 	\ifnum\pc@penalty>0

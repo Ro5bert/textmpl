@@ -8,8 +8,11 @@
 \centerline{1 Jan.\ 2020}
 \bigskip
 
-\problem Example Problem\par
+\problem Problem 1\par
 	Do something.
+\endproblem
+\subproblemx Part 1\par
+	Do something specific.
 \endproblem
 Example algorithm:
 
@@ -19,10 +22,16 @@ Example algorithm:
 		\Return;
 	\End
 	$m := \Call PartitionInPlace($A$, $l$, $r$)$;
-	\Call QuickSort($A$, l, m-1);
-	\Call QuickSort($A$, m+1, r);
+	\Call QuickSort($A$, $l$, $m-1$);
+	\Call QuickSort($A$, $m+1$, $r$);
 \End
 \endpcode
+
+Some text.
+\subproblem Part 2\par
+	Do something else.
+\endproblem
+More text...
 
 \ifnum\pageno=1\nopagenumbers\fi
 \bye
