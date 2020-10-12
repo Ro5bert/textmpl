@@ -8,14 +8,12 @@
 \centerline{1 Jan.\ 2020}
 \bigskip
 
-\problem Problem 1\par
-	Do something.
-\endproblem
-\subproblemx Part 1\par
-	Do something specific.
-\endproblem
+\prob Problem 1.
+\pstmt Do something.
+\part Part 1.
+\pstmt Do something specific.
+\psoln
 Example algorithm:
-
 \beginpcode
 \Func QuickSort($A$, $l$, $r$)
 	\If $l \geq r$ \Then
@@ -26,12 +24,10 @@ Example algorithm:
 	\Call QuickSort($A$, $m+1$, $r$);
 \End
 \endpcode
-
 Some text.
-\subproblem Part 2\par
-	Do something else.
-\endproblem
-More text...
+\part Part 2.
+\pstmt Do something else.
+\psoln More text...
 
 \ifnum\pageno=1\nopagenumbers\fi
 \bye

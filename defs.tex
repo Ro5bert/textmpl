@@ -206,22 +206,22 @@
 \def\xbigskip{\xvskip\bigskipamount}
 \def\xhugeskip{\xvskip\hugeskipamount}
 
-% Disable parskip until the next paragraph.
-% Changes are local to group.
-\newskip\nps@oldparskip
-\def\noparskip{%
-	\ifx\nps@oldpar\@undefined
-		\let\nps@oldpar=\par
-		\nps@oldparskip=\parskip
-		\parskip=0pt
+% Change parskip until the next paragraph.
+% Change is local to group.
+\newskip\tps@oldparskip
+\def\tmpparskip#1{%
+	\ifx\tps@oldpar\@undefined
+		\let\tps@oldpar=\par
+		\tps@oldparskip=\parskip
 		\def\par{%
 			\ifhmode
-				\parskip=\nps@oldparskip
-				\let\par=\nps@oldpar
-				\let\nps@oldpar=\@undefined
+				\parskip=\tps@oldparskip
+				\let\par=\tps@oldpar
+				\let\tps@oldpar=\@undefined
 				\par
 			\fi}%
-	\fi}
+	\fi
+	\parskip=#1}
 
 % \imp to match \iff.
 \def\imp{\;\Longrightarrow\;}
@@ -294,33 +294,51 @@
 	{\mapfour{\dsty\dsty}{\tsty\tsty}{\ssty\ssty}{\sssty\sssty}}}
 
 % TODO allow breaking problem statements across pages.
-\def\problem#1\par{\@problem\prob@topskip{\twelvebf#1}}
-\def\subproblem#1\par{\@problem\prob@topskip{\tenbf#1}}
-\def\subproblemx#1\par{\@problem{0pt}{\tenbf#1}}
-\def\@problem#1#2{%
-	\par\begingroup
-	\vskip 0pt plus100pt \penalty0 \vskip 0pt plus-100pt
-	\vskip#1%
-	\nointerlineskip\hbox{#2}%
+% p@last is last problem-related macro used.
+%   0 => other
+%   1 => header
+%   2 => statement
+\newcount\p@last \p@last=0
+\newbox\pstmt@box
+\def\prob{\@phdr\twelvebf}
+\def\part{\@phdr\tenbf}
+\def\@phdr#1.{%
+	\ifnum\p@last=2 \@endpstmt \else \par \fi
+	\ifnum\p@last=0 \vskip 0pt plus100pt \penalty0 \vskip 0pt plus-100pt \fi
+	\ifnum\p@last<2 \nobreak\vskip\prob@topskip \fi
+	\nointerlineskip\hbox{#1}%
+	\p@last=1}
+\def\pstmt{%
+	\par
+	\p@last=2
 	\nobreak\medskip
-	\setbox0=\vbox\bgroup
+	\setbox\pstmt@box=\vbox\bgroup
 		\advance \hsize by -2\prob@sidesize
 		\def\nostrut{\let\strut=\relax}%
 		\ninept\sl\noindent\strut}
-\def\endproblem{%
-	\strut\egroup% End the vbox started in \@problem.
-	\dimen0=\ht0 \advance \dimen0 by 2pt
-	\dimen1=\dp0 \advance \dimen1 by 2pt
+\def\@endpstmt{%
+	\strut\egroup% End the vbox started in \pstmt.
+	\dimen0=\ht\pstmt@box \advance \dimen0 by 2pt
+	\dimen1=\dp\pstmt@box \advance \dimen1 by 2pt
 	\nointerlineskip\hbox to \hsize{%
 		\hfil
 		\vrule height\dimen0 depth\dimen1
 		\hskip\prob@rulegap
-		\box0
+		\box\pstmt@box
 		\hskip\prob@rulegap
 		\hskip 0.4pt plus1fil}%
 	\nointerlineskip
-	\penalty25\medskip
-	\endgroup\noparskip}
+	\penalty25\medskip}
+\def\psoln{%
+	\ifcase\p@last
+		\errmessage{psoln must be preceded by prob/part/pstmt}%
+	\or
+		\nobreak\medskip
+	\or
+		\@endpstmt
+	\fi
+	\p@last=0
+	\tmpparskip{0pt}}
 
 \let\itemitem=\@undefined
 \def\item{\@item1}
@@ -401,7 +419,7 @@
 \def\endpcode{%
 	\kern2pt \pc@dorule
 	\xpvskip\pc@topbotpenalty\pc@topbotskip
-	\endgroup\noparskip}
+	\endgroup\tmpparskip{0pt}}
 \def\pc@addpenalty#1{\advance \pc@penalty by #1}
 \def\pc@emitpenalty{%
 	\ifnum\pc@penalty>0
