@@ -206,6 +206,13 @@
 \def\xbigskip{\xvskip\bigskipamount}
 \def\xhugeskip{\xvskip\hugeskipamount}
 
+% Integrals
+\def\d{{\rm d}} % Preceed with \, usually.
+\def\dx{\d x} \def\dy{\d y} \def\dt{\d t}
+\def\@intkern{\mkern-9mu\mathchoice{\mkern-5mu}{}{}{}}
+\def\iint{\int\@intkern\int\nolimits}
+\def\iiint{\int\@intkern\int\@intkern\int\nolimits}
+
 % Change parskip until the next paragraph.
 % Change is local to group.
 \newskip\tps@oldparskip
@@ -249,7 +256,6 @@
 \def\khat{{\bf\mathaccent"705E k}}
 
 \def\?{\mathrel{\mathop=\limits^?}}
-\def\d{{\rm d}} % For dx in integrals, etc. Preceed with \, usually.
 \def\falling#1#2{#1^{\underline{#2}}}
 \def\rising#1#2{#1^{\overline{#2}}}
 \def\rect#1#2#3{% inner width, inner height, line thickness 
