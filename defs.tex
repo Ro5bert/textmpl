@@ -364,18 +364,32 @@
 	\def\@help##1{##1\hskip#2\relax\@help}%
 	\@help#1\@terminator\unskip}
 
-\def\initverb{%
-	\catcode`\\=12 \catcode`\{=12
-	\catcode`\}=12 \catcode`\$=12
-	\catcode`\&=12 \catcode`\#=12
-	\catcode`\^=12 \catcode`\_=12
-	\catcode`\%=12 \catcode`\~=12
-	\obeyspaces\obeylines}
-\def\verb#1#2{\begingroup
-	#1% Arbitrary local initialization before catcodes change.
-	\initverb
-	\long\def\@verb##1#2{##1\endgroup}%
-	\@verb}
+% General purpose verbatim. Usage:
+%   \iverb <arbitrary local initialization> \verb<<an arbitrary delimiter
+%   {this} %is
+%		$all$ ~verbatim--
+%   an arbitrary delimiter
+%   Back to non-verbatim.
+\def\iverb{\begingroup}
+% Like plain \obeyspaces, but use control spaces, not \space.
+{\obeyspaces\gdef\verb@obeyspaces{\let =\ \obeyspaces}}
+{\obeylines\gdef\verb{%
+	\def\@verb<<##1^^M{% Scan delimiter like Unix here doc.
+		\long\def\@@verb####1##1{####1\endgroup}%
+		\@@verb}%
+	\def\do##1{\catcode`##1=12 }\dospecials% Init specials
+	\def\par{\leavevmode\endgraf}\obeylines% Init lines
+	\verb@obeyspaces                       % Init spaces
+	\@verb}}
+
+% Convert tabs into 4 spaces (for code listings).
+{\catcode`\^^I=13
+\gdef\expandtabs{\catcode`\^^I=13\def^^I{\ \ \ \ }}}
+
+% Start code block. Terminate with "EOF".
+\def\code{\par\iverb
+	\narrowerby{20pt} \parskip=0pt \expandtabs \tt
+	\verb<<EOF}
 
 % Zero pad a positive integer. E.g., \zeropad{000}{13} -> 013.
 % Idea from https://tex.stackexchange.com/a/412225/202281.
