@@ -323,7 +323,7 @@
 		\def\nostrut{\let\strut=\relax}%
 		\ninept\sl\noindent\strut}
 \def\@endpstmt{%
-	\strut\egroup% End the vbox started in \pstmt.
+	\unskip\strut\egroup% End the vbox started in \pstmt.
 	\dimen0=\ht\pstmt@box \advance \dimen0 by 2pt
 	\dimen1=\dp\pstmt@box \advance \dimen1 by 2pt
 	\nointerlineskip\hbox to \hsize{%
