@@ -528,8 +528,53 @@
 \def\Mark#1{\edef#1{\the\pc@lineno}}
 \def\Markg{\global\Mark}
 
-% Insert pdf image (PDFTex only).
+% PDFTeX only stuff.
+\ifx\pdfoutput\@undefined \else
+
+% Insert pdf image.
 \def\pdfimg#1file #2.pdf{\pdfximage#1{#2.pdf}\pdfrefximage\pdflastximage}
+
+% Color support.
+\mathchardef\@colorstackn=\pdfcolorstackinit page {0 g 0 G}
+\def\@pdfcolorstackpush#1{\pdfcolorstack\@colorstackn push {#1}}
+\def\@pdfcolorstackpop{\pdfcolorstack\@colorstackn pop}
+\def\@setcolor#1{\@pdfcolorstackpush{#1}\aftergroup\@pdfcolorstackpop}
+\def\setcolorrgb#1#2#3{\@setcolor{#1 #2 #3 rg #1 #2 #3 RG}}
+\def\setcolorgrey#1{\@setcolor{#1 g #1 G}}
+
+% Basic colors.
+\def\cblack{\setcolorgrey{0}}
+\def\cwhite{\setcolorgrey{1}}
+\def\cred{\setcolorrgb    {1}{0}{0}}
+\def\cgreen{\setcolorrgb  {0}{1}{0}}
+\def\cblue{\setcolorrgb   {0}{0}{1}}
+\def\ccyan{\setcolorrgb   {0}{1}{1}}
+\def\cmagenta{\setcolorrgb{1}{0}{1}}
+\def\cyellow{\setcolorrgb {1}{1}{0}}
+
+{\catcode`\p=12 \catcode`\t=12 \gdef\@#1pt{#1}}
+\let\@strippt=\@
+\newdimen\@htddimen
+\def\@hextodec#1#2#3#4#5{%
+	\@htddimen="#2#3#4#5sp \edef#1{\ea\@strippt\the\@htddimen}}
+
+% Arbitrary HTML-style hex colors.
+\def\chex:#1#2#3#4#5#6{%
+	\begingroup
+	\@hextodec\R#1#2#1#2%
+	\@hextodec\G#3#4#3#4%
+	\@hextodec\B#5#6#5#6%
+	\edef\@{\endgroup\noexpand\setcolorrgb{\R}{\G}{\B}}%
+	\@\ignorespaces}
+
+% 16 shades of grey.
+\def\cgrey:#1{%
+	\begingroup
+	\@hextodec\grey#1#1#1#1%
+	\edef\@{\endgroup\noexpand\setcolorgrey{\grey}}%
+	\@\ignorespaces}
+
+\fi % PDFTeX only stuff.
 
 \catcode`@=12
 \endinput
