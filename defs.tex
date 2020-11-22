@@ -213,6 +213,12 @@
 \def\iint{\int\@intkern\int\nolimits}
 \def\iiint{\int\@intkern\int\@intkern\int\nolimits}
 
+% For \sums mainly. This just sticks .25ex between lines,
+% which seems to work well enough.
+\def\substack#1{\vtop{%
+	\baselineskip=-1000pt \lineskip=.25ex \lineskiplimit=\maxdimen
+	\ialign{\hfil$\ssty##$\hfil\crcr#1\crcr}}}
+
 % Change parskip until the next paragraph.
 % Change is local to group.
 \newskip\tps@oldparskip
