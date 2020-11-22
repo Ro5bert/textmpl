@@ -100,6 +100,15 @@
 \font\sixbmit=cmmib6   \skewchar\sixbmit='177
 \font\fivebmit=cmmib5  \skewchar\fivebmit='177
 
+% Plain TeX does not provide names for fams 0 through 4, so we add them.
+\chardef\rmfam=0
+\chardef\mitfam=1
+\chardef\syfam=2
+\chardef\exfam=3
+% itfam = 4
+% slfam = 5
+% bffam = 6
+% ttfam = 7
 \newfam\scfam
 \newfam\ssfam
 \newfam\bbfam
@@ -121,9 +130,9 @@
 \def\bmit{\fam=\bmitfam}
 
 \def\tenpt{%
-	\initfam0\tenrm\sevenrm\fiverm
-	\initfam1\teni\seveni\fivei
-	\initfam2\tensy\sevensy\fivesy
+	\initfam\rmfam\tenrm\sevenrm\fiverm
+	\initfam\mitfam\teni\seveni\fivei
+	\initfam\syfam\tensy\sevensy\fivesy
 	\initfam\itfam\tenit\nullfont\nullfont
 	\initfam\slfam\tensl\nullfont\nullfont
 	\initfam\bffam\tenbf\sevenbf\fivebf
@@ -134,7 +143,7 @@
 	\initfam\scrfam\tenscr\sevenscr\fivescr
 	\initfam\eucalfam\teneucal\seveneucal\fiveeucal
 	\initfam\bmitfam\tenbmit\sevenbmit\fivebmit
-	\def\rm{\fam=0      \tenrm}%
+	\def\rm{\fam=\rmfam \tenrm}%
 	\def\it{\fam=\itfam \tenit}%
 	\def\sl{\fam=\slfam \tensl}%
 	\def\bf{\fam=\bffam \tenbf}%
@@ -142,13 +151,18 @@
 	\def\sc{\fam=\scfam \tensc}%
 	\def\ss{\fam=\ssfam \tenss}%
 	\setbox\strutbox=\hbox{\vrule height8.5pt depth3.5pt width0pt}%
+	% These are the default values from plain TeX.
+	\abovedisplayskip=12pt plus3pt minus9pt
+	\belowdisplayskip=12pt plus3pt minus9pt
+	\abovedisplayshortskip=0pt plus3pt
+	\belowdisplayshortskip=7pt plus3pt minus4pt
 	\normalbaselineskip=12pt
 	\normalbaselines\rm}
 
 \def\ninept{%
-	\initfam0\ninerm\sixrm\fiverm
-	\initfam1\ninei\sixi\fivei
-	\initfam2\ninesy\sixsy\fivesy
+	\initfam\rmfam\ninerm\sixrm\fiverm
+	\initfam\mitfam\ninei\sixi\fivei
+	\initfam\syfam\ninesy\sixsy\fivesy
 	\initfam\itfam\nineit\nullfont\nullfont
 	\initfam\slfam\ninesl\nullfont\nullfont
 	\initfam\bffam\ninebf\sixbf\fivebf
@@ -159,7 +173,7 @@
 	\initfam\scrfam\ninescr\sixscr\fivescr
 	\initfam\eucalfam\nineeucal\sixeucal\fiveeucal
 	\initfam\bmitfam\ninebmit\sixbmit\fivebmit
-	\def\rm{\fam=0      \ninerm}%
+	\def\rm{\fam=\rmfam \ninerm}%
 	\def\it{\fam=\itfam \nineit}%
 	\def\sl{\fam=\slfam \ninesl}%
 	\def\bf{\fam=\bffam \ninebf}%
@@ -167,6 +181,12 @@
 	\def\sc{\fam=\scfam \ninesc}%
 	\def\ss{\fam=\ssfam \niness}%
 	\setbox\strutbox=\hbox{\vrule height8pt depth3pt width0pt}%
+	% I chose these values without too much thought, so maybe they're not
+	% very good. Basically, everything is reduced by 2pt except the stretch.
+	\abovedisplayskip=10pt plus3pt minus7pt
+	\belowdisplayskip=10pt plus3pt minus7pt
+	\abovedisplayshortskip=0pt plus3pt
+	\belowdisplayshortskip=5pt plus3pt minus2pt
 	\normalbaselineskip=11pt
 	\normalbaselines\rm}
 
