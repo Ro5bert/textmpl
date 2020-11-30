@@ -15,6 +15,7 @@
 
 % TODO allocate registers for temporary use
 \newskip\hugeskipamount    \hugeskipamount=24pt plus8pt minus8pt
+\newcount\verbpenalty      \verbpenalty=0
 \newdimen\prob@sidesize    \prob@sidesize=20pt
 \newdimen\prob@rulegap     \prob@rulegap=5pt
 \newskip\prob@topskip      \prob@topskip=12pt plus6pt minus2pt
@@ -404,9 +405,9 @@
 	\def\@verb<<##1^^M{% Scan delimiter like Unix here doc.
 		\long\def\@@verb####1##1{####1\endgroup}%
 		\@@verb}%
-	\def\do##1{\catcode`##1=12 }\dospecials% Init specials
-	\def\par{\leavevmode\endgraf}\obeylines% Init lines
-	\verb@obeyspaces                       % Init spaces
+	\def\do##1{\catcode`##1=12 }\dospecials                    % Init specials
+	\def\par{\leavevmode\endgraf\penalty\verbpenalty}\obeylines% Init lines
+	\verb@obeyspaces                                           % Init spaces
 	\@verb}}
 
 % Convert tabs into 4 spaces (for code listings).
@@ -415,7 +416,7 @@
 
 % Start code block. Terminate with "EOF".
 \def\code{\par\iverb
-	\narrowerby{20pt} \parskip=0pt \expandtabs \tt
+	\verbpenalty=1000 \narrowerby{20pt} \parskip=0pt \expandtabs \tt
 	\verb<<EOF}
 
 % Zero pad a positive integer. E.g., \zeropad{000}{13} -> 013.
