@@ -324,17 +324,15 @@
 		\hrule height#3
 		\hbox{\vrule width#3 height#2 \kern#1 \vrule width#3}%
 		\hrule height#3}}}
-\def\qedbox{\rect{0.6em}{0.6em}{0.5pt}}
-\def\qed{\unskip\hskip1em plus1fil \hbox{}\nobreak\hfill$\qedbox$\par}
 
 % https://www.tug.org/TUGboat/tb22-4/tb72perlS.pdf
 \def\clap#1{\hbox to 0pt{\hss#1\hss}}
 \def\mathllap{\mathpalette\@mathllapinternal}
 \def\mathrlap{\mathpalette\@mathrlapinternal}
 \def\mathclap{\mathpalette\@mathclapinternal}
-\def\@mathllapinternal#1#2{\llap{$\mathsurround=0pt#1{#2}$}}
-\def\@mathrlapinternal#1#2{\rlap{$\mathsurround=0pt#1{#2}$}}
-\def\@mathclapinternal#1#2{\clap{$\mathsurround=0pt#1{#2}$}}
+\def\@mathllapinternal#1#2{\llap{$\m@th#1{#2}$}}
+\def\@mathrlapinternal#1#2{\rlap{$\m@th#1{#2}$}}
+\def\@mathclapinternal#1#2{\clap{$\m@th#1{#2}$}}
 
 % mappalette is like mathpalette, except instead of the first argument to the
 % given CS being the current math style, it is whatever the given mapfour maps
@@ -360,6 +358,20 @@
 \def\msupimpmap#1#2#3{\mappalette{#1}\@msupimpinternal{{#2}{#3}}}
 \def\msupimp{\msupimpmap
 	{\mapfour{\dsty\dsty}{\tsty\tsty}{\ssty\ssty}{\sssty\sssty}}}
+
+% Theorems+proof, lemmas+proof, definitions, etc.
+% Plain TeX proclaim has been modified to use \@penalty \@vskip constructions
+% and suppress parskip.
+\def\proclaim #1. #2\par{%
+	\par \@medbreak \noparskip
+	\noindent{\bf#1.\enspace}{\sl#2\par}%
+	\@penalty55 \@medskip \noparskip}
+\def\proof{% use \proof ... \qed
+	\par \@medskip \noparskip
+	\begingroup \let\@qed=\qed \def\qed{\@qed\@medskip\noparskip\endgroup}%
+	\noindent{\it Proof.\enspace}}
+\def\qedbox{\rect{0.6em}{0.6em}{0.5pt}}
+\def\qed{\unskip\hskip1em plus1fil \hbox{}\nobreak\hfill$\qedbox$\par}
 
 % TODO allow breaking problem statements across pages.
 % p@last is last problem-related macro used.
