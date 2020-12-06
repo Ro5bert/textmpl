@@ -13,7 +13,6 @@
 \parindent=0pt
 \parskip=\smallskipamount
 
-% TODO allocate registers for temporary use
 \newskip\hugeskipamount    \hugeskipamount=24pt plus8pt minus8pt
 \newcount\verbpenalty      \verbpenalty=0
 \newdimen\prob@sidesize    \prob@sidesize=20pt
@@ -30,6 +29,12 @@
 \newdimen\pc@linenogap     \pc@linenogap=5pt
 \newskip\pc@sideskip       \pc@sideskip=20pt
 \newskip\pc@topbotskip     \pc@topbotskip=\bigskipamount
+
+% Registers for temporary use.
+\newcount\@count \newcount\@@count
+\newskip\@skip   \newskip\@@skip
+\newdimen\@dimen \newdimen\@@dimen
+\newbox\@box     \newbox\@@box
 
 
 % FONTS
