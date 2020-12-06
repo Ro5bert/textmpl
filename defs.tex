@@ -225,13 +225,58 @@
 \let\del=\partial
 
 % Vertical skips
+
 \def\hugeskip{\vskip\hugeskipamount}
-\def\xpvskip#1#2{\par\ifdim\lastskip<#2\removelastskip\penalty#1\vskip#2\fi}
-\def\xvskip#1{\xpvskip0{#1}}
-\def\xsmallskip{\xvskip\smallskipamount}
-\def\xmedskip{\xvskip\medskipamount}
-\def\xbigskip{\xvskip\bigskipamount}
-\def\xhugeskip{\xvskip\hugeskipamount}
+\def\hugebreak{\par \ifdim\lastskip<\hugeskipamount
+	\removelastskip \penalty-400 \hugeskip \fi}
+
+% \revskip replaces the previous glue on the vertical list with the
+% specified glue.
+\def\revskip{\par\removelastskip\vskip}
+\def\resmallskip{\revskip\smallskipamount}
+\def\remedskip{\revskip\medskipamount}
+\def\rebigskip{\revskip\bigskipamount}
+\def\rehugeskip{\revskip\hugeskipamount}
+
+% \@vskip inserts the specified glue only if \lastskip=0pt (i.e., if the last
+% item on the current vertical list isn't a glue). The intented use is for
+% macros that typically insert glue before some content (e.g., a figure or an
+% algorithm), so that the user can override the glue before the content simply
+% by specifying an explicit skip before using the macro. Also, the penalty in
+% register \@penalty is inserted before the glue if \@penalty isn't 0,
+% and \@penalty is zeroed.
+\newcount\@penalty \@penalty=0
+\def\@vskip{%
+	\par\begingroup
+	\def\@{\ifdim\lastskip=0pt
+		\ifnum\@penalty=0 \else \penalty\@penalty \fi
+		\vskip\@skip \fi \global\@penalty=0 \endgroup}%
+	\afterassignment\@\@skip=}
+\def\@smallskip{\@vskip\smallskipamount}
+\def\@medskip{\@vskip\medskipamount}
+\def\@bigskip{\@vskip\bigskipamount}
+\def\@hugeskip{\@vskip\hugeskipamount}
+\def\@smallbreak{\@penalty-50 \@smallskip}
+\def\@medbreak{\@penalty-100 \@medskip}
+\def\@bigbreak{\@penalty-200 \@bigskip}
+\def\@hugebreak{\@penalty-400 \@hugeskip}
+
+% Change parskip until after the next paragraph.
+\newskip\tps@oldparskip
+\def\tmpparskip#1{%
+	\ifx\tps@oldpar\@undefined
+		\global\let\tps@oldpar=\par
+		\global\tps@oldparskip=\parskip
+		\gdef\@restoreparskip{%
+			\global\parskip=\tps@oldparskip
+			\global\let\par=\tps@oldpar
+			\global\let\tps@oldpar=\@undefined}
+		\gdef\par{\ifhmode \@restoreparskip\par \fi}%
+	\fi
+	\global\parskip=#1}
+\let\@restoreparskip=\relax
+\def\noparskip{\tmpparskip{0pt}}
+\def\yesparskip{\@restoreparskip}
 
 % Integrals
 \def\d{{\rm d}} % Preceed with \, usually.
@@ -245,23 +290,6 @@
 \def\substack#1{\vtop{%
 	\baselineskip=-1000pt \lineskip=.25ex \lineskiplimit=\maxdimen
 	\ialign{\hfil$\ssty##$\hfil\crcr#1\crcr}}}
-
-% Change parskip until the next paragraph.
-% Change is local to group.
-\newskip\tps@oldparskip
-\def\tmpparskip#1{%
-	\ifx\tps@oldpar\@undefined
-		\let\tps@oldpar=\par
-		\tps@oldparskip=\parskip
-		\def\par{%
-			\ifhmode
-				\parskip=\tps@oldparskip
-				\let\par=\tps@oldpar
-				\let\tps@oldpar=\@undefined
-				\par
-			\fi}%
-	\fi
-	\parskip=#1}
 
 % \imp to match \iff.
 \def\imp{\;\Longrightarrow\;}
@@ -319,6 +347,7 @@
 % Superimposition
 % This was mostly an excercise. This would probably
 % be better done with alignment macros like ooalign.
+% TODO: remove/replace with ooalign
 \def\supimp#1#2{{%
 	\leavevmode
 	\setbox1=\hbox{#1}\setbox2=\hbox{#2}%
@@ -377,7 +406,7 @@
 		\@endpstmt
 	\fi
 	\p@last=0
-	\tmpparskip{0pt}}
+	\noparskip}
 
 \let\itemitem=\@undefined
 \def\item{\@item1}
@@ -467,12 +496,12 @@
 	\pc@penalty=0
 	\pc@lineno=0
 	\setbox\pc@comment=\box\voidb@x
-	\xpvskip\pc@topbotpenalty\pc@topbotskip
+	\@penalty\pc@topbotpenalty \@vskip\pc@topbotskip
 	\pc@dorule\kern2pt}
 \def\endpcode{%
 	\kern2pt \pc@dorule
-	\xpvskip\pc@topbotpenalty\pc@topbotskip
-	\endgroup\tmpparskip{0pt}}
+	\@penalty\pc@topbotpenalty \@vskip\pc@topbotskip
+	\endgroup\noparskip}
 \def\pc@addpenalty#1{\advance \pc@penalty by #1}
 \def\pc@emitpenalty{%
 	\ifnum\pc@penalty>0
