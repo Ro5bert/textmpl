@@ -2,7 +2,7 @@
 
 \ifx\@defsloaded\relax
 	\immediate\write16{defs.tex: warning: loaded multiple times}
-	\endinput
+	\expandafter\endinput
 \else
 	\let\@defsloaded=\relax
 \fi
