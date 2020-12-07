@@ -19,6 +19,16 @@
 % Idea from https://tex.stackexchange.com/a/412225/202281.
 \def\zeropad#1#2{\ifnum1#1>1#2 \zeropad{#1}{0#2}\else#2\fi}
 
+% Strip "pt" off the end of \the\dimenX. Argument must be fully expanded.
+{\catcode`\p=12 \catcode`\t=12 \gdef\@#1pt{#1}}
+\let\@strippt=\@ \let\@=\@undefined
+
+% Convert 4 digit hex number #2#3#4#5 to decimal in range [0,1) and store
+% it in #1.
+\newdimen\@htddimen
+\def\@hextodec#1#2#3#4#5{%
+	\@htddimen="#2#3#4#5sp \edef#1{\ea\@strippt\the\@htddimen}}
+
 
 %%% PARAMETERS/REGISTER ALLOCATION %%%
 
@@ -632,6 +642,7 @@
 
 
 %%% PDFTeX %%%
+
 \ifx\pdfoutput\@undefined \else
 
 % Insert pdf image.
@@ -654,12 +665,6 @@
 \def\ccyan{\setcolorrgb   {0}{1}{1}}
 \def\cmagenta{\setcolorrgb{1}{0}{1}}
 \def\cyellow{\setcolorrgb {1}{1}{0}}
-
-{\catcode`\p=12 \catcode`\t=12 \gdef\@#1pt{#1}}
-\let\@strippt=\@
-\newdimen\@htddimen
-\def\@hextodec#1#2#3#4#5{%
-	\@htddimen="#2#3#4#5sp \edef#1{\ea\@strippt\the\@htddimen}}
 
 % Arbitrary HTML-style hex colors.
 \def\chex:#1#2#3#4#5#6{%
