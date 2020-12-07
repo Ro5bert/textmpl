@@ -1,11 +1,26 @@
 \catcode`@=11
 
+%%% DEBUGGING/TESTING %%%
+
 \def\supershowlists{\par
 	{\showboxdepth=1000 \showboxbreadth=1000000 \showlists}}
 \def\vruletest{\smash{\vrule height\vsize depth\vsize}}
 
 
-% PARAMETERS/REGISTER ALLOCATION
+%%% UTIL %%%
+
+% Shortcut---long chains of expandafters can be a lot of characters.
+\let\ea=\expandafter
+
+\def\1#1#2{#1} % I.e., firstoftwo
+\def\2#1#2{#2} % I.e., secondoftwo
+
+% Zero pad a positive integer. E.g., \zeropad{000}{13} => 013.
+% Idea from https://tex.stackexchange.com/a/412225/202281.
+\def\zeropad#1#2{\ifnum1#1>1#2 \zeropad{#1}{0#2}\else#2\fi}
+
+
+%%% PARAMETERS/REGISTER ALLOCATION %%%
 
 % \parindent, prob@sidesize, item@indent, and pc@sideskip should
 % be kept in sync so that indentations look consistent.
@@ -37,7 +52,7 @@
 \newbox\@box     \newbox\@@box
 
 
-% FONTS
+%%% FONTS %%%
 
 % We use 10/7/5 for normal text, and 9/6/5 for problem statement text.
 % Little/no effort has been made to make sure math symbols work properly with
@@ -200,31 +215,7 @@
 \tenpt
 
 
-% MACROS/ASSIGNMENTS
-
-\def\1#1#2{#1} % I.e., firstoftwo
-\def\2#1#2{#2} % I.e., secondoftwo
-
-% Shortcuts
-\let\ea=\expandafter
-\let\dsty=\displaystyle
-\let\tsty=\textstyle
-\let\ssty=\scriptstyle
-\let\sssty=\scriptscriptstyle
-\let\lc=\lceil
-\let\rc=\rceil
-\let\lf=\lfloor
-\let\rf=\rfloor
-
-% Alternate names
-\let\:=\colon % Punctuation colon. Regular colon is a relation.
-\let\lxor=\oplus
-\let\limp=\rightarrow
-\let\liff=\leftrightarrow
-\let\grad=\nabla
-\let\del=\partial
-
-% Vertical skips
+%%% VERTICAL SKIPS %%%
 
 \def\hugeskip{\vskip\hugeskipamount}
 \def\hugebreak{\par \ifdim\lastskip<\hugeskipamount
@@ -278,6 +269,83 @@
 \def\noparskip{\tmpparskip{0pt}}
 \def\yesparskip{\@restoreparskip}
 
+
+%%% TEXT %%%
+
+% Lists, with dedicated macros for up to 3 levels of nesting.
+\let\itemitem=\@undefined
+\def\item{\@item1}
+\def\iitem{\@item2}
+\def\iiitem{\@item3}
+\def\@item#1#2{%
+	\par \hangafter=0 \hangindent=#1\item@indent
+	\noindent\llap{\rm#2\enspace}\ignorespaces}
+
+% Like Plain TeX narrower, but advance left/rightskip by specified ammount
+% instead of by parindent.
+\def\narrowerby#1{%
+	\advance \leftskip  by #1%
+	\advance \rightskip by #1}
+
+% Spread tokens in #1 by glue in #2.
+% E.g., "abcd" => "a  b  c  d".
+\def\spread#1#2{%
+	\def\@terminator##1\@help{}%
+	\def\@help##1{##1\hskip#2\relax\@help}%
+	\@help#1\@terminator\unskip}
+
+% Plain TeX only provides llap and rlap.
+\def\clap#1{\hbox to 0pt{\hss#1\hss}}
+
+% Same as plain raggedright, but 2em changed to 3em, and it advances rightskip,
+% instead of setting it.
+\def\raggedright{%
+	\advance \rightskip by 0pt plus 3em
+	\spaceskip=0.3333em \xspaceskip=0.5em\relax}
+
+% Theorems+proof, lemmas+proof, definitions, etc.
+% Plain TeX proclaim has been modified to use \@penalty \@vskip constructions
+% and suppress parskip.
+\def\proclaim #1. #2\par{%
+	\par \@medbreak \noparskip
+	\noindent{\bf#1.\enspace}{\sl#2\par}%
+	\@penalty55 \@medskip \noparskip}
+\def\proof{% use \proof ... \qed
+	\par \@medskip \noparskip
+	\begingroup \let\@qed=\qed \def\qed{\@qed\@medskip\noparskip\endgroup}%
+	\noindent{\it Proof.\enspace}}
+\def\qedbox{\rect{0.6em}{0.6em}{0.5pt}}
+\def\qed{\unskip\hskip1em plus1fil \hbox{}\nobreak\hfill$\qedbox$\par}
+
+
+%%% MATH %%%
+
+% Shortcuts
+\let\dsty=\displaystyle
+\let\tsty=\textstyle
+\let\ssty=\scriptstyle
+\let\sssty=\scriptscriptstyle
+\let\lc=\lceil
+\let\rc=\rceil
+\let\lf=\lfloor
+\let\rf=\rfloor
+
+% Alternate names
+\let\:=\colon % Punctuation colon. Regular colon is a relation.
+\let\lxor=\oplus
+\let\limp=\rightarrow
+\let\liff=\leftrightarrow
+\let\grad=\nabla
+\let\del=\partial
+
+% https://www.tug.org/TUGboat/tb22-4/tb72perlS.pdf
+\def\mathllap{\mathpalette\@mathllapinternal}
+\def\mathrlap{\mathpalette\@mathrlapinternal}
+\def\mathclap{\mathpalette\@mathclapinternal}
+\def\@mathllapinternal#1#2{\llap{$\m@th#1{#2}$}}
+\def\@mathrlapinternal#1#2{\rlap{$\m@th#1{#2}$}}
+\def\@mathclapinternal#1#2{\clap{$\m@th#1{#2}$}}
+
 % Integrals
 \def\d{{\rm d}} % Preceed with \, usually.
 \def\dx{\d x} \def\dy{\d y} \def\dt{\d t}
@@ -312,11 +380,12 @@
 \def\littleomega{\omega}
 \def\bigtheta{{\rm \Theta}}
 
+% i/j/k vector components.
 \def\ihat{{\bf\mathaccent"705E \mathchar"7010}}
 \def\jhat{{\bf\mathaccent"705E \mathchar"7011}}
 \def\khat{{\bf\mathaccent"705E k}}
 
-\def\?{\mathrel{\mathop=\limits^?}}
+\def\?{\buildrel?\over=}
 \def\falling#1#2{#1^{\underline{#2}}}
 \def\rising#1#2{#1^{\overline{#2}}}
 \def\rect#1#2#3{% inner width, inner height, line thickness 
@@ -325,15 +394,7 @@
 		\hbox{\vrule width#3 height#2 \kern#1 \vrule width#3}%
 		\hrule height#3}}}
 
-% https://www.tug.org/TUGboat/tb22-4/tb72perlS.pdf
-\def\clap#1{\hbox to 0pt{\hss#1\hss}}
-\def\mathllap{\mathpalette\@mathllapinternal}
-\def\mathrlap{\mathpalette\@mathrlapinternal}
-\def\mathclap{\mathpalette\@mathclapinternal}
-\def\@mathllapinternal#1#2{\llap{$\m@th#1{#2}$}}
-\def\@mathrlapinternal#1#2{\rlap{$\m@th#1{#2}$}}
-\def\@mathclapinternal#1#2{\clap{$\m@th#1{#2}$}}
-
+% TODO this is weird; get rid of it.
 % mappalette is like mathpalette, except instead of the first argument to the
 % given CS being the current math style, it is whatever the given mapfour maps
 % the current math style to.
@@ -342,10 +403,10 @@
 	{\edef\@arg{#10}\ea#2\ea{\@arg}{#3}}{\edef\@arg{#11}\ea#2\ea{\@arg}{#3}}
 	{\edef\@arg{#12}\ea#2\ea{\@arg}{#3}}{\edef\@arg{#13}\ea#2\ea{\@arg}{#3}}}
 
+% TODO: remove/replace with ooalign
 % Superimposition
 % This was mostly an excercise. This would probably
 % be better done with alignment macros like ooalign.
-% TODO: remove/replace with ooalign
 \def\supimp#1#2{{%
 	\leavevmode
 	\setbox1=\hbox{#1}\setbox2=\hbox{#2}%
@@ -359,21 +420,10 @@
 \def\msupimp{\msupimpmap
 	{\mapfour{\dsty\dsty}{\tsty\tsty}{\ssty\ssty}{\sssty\sssty}}}
 
-% Theorems+proof, lemmas+proof, definitions, etc.
-% Plain TeX proclaim has been modified to use \@penalty \@vskip constructions
-% and suppress parskip.
-\def\proclaim #1. #2\par{%
-	\par \@medbreak \noparskip
-	\noindent{\bf#1.\enspace}{\sl#2\par}%
-	\@penalty55 \@medskip \noparskip}
-\def\proof{% use \proof ... \qed
-	\par \@medskip \noparskip
-	\begingroup \let\@qed=\qed \def\qed{\@qed\@medskip\noparskip\endgroup}%
-	\noindent{\it Proof.\enspace}}
-\def\qedbox{\rect{0.6em}{0.6em}{0.5pt}}
-\def\qed{\unskip\hskip1em plus1fil \hbox{}\nobreak\hfill$\qedbox$\par}
 
+%%% PROBLEMS %%%
 % TODO allow breaking problem statements across pages.
+
 % p@last is last problem-related macro used.
 %   0 => other
 %   1 => header
@@ -420,25 +470,10 @@
 	\p@last=0
 	\noparskip}
 
-\let\itemitem=\@undefined
-\def\item{\@item1}
-\def\iitem{\@item2}
-\def\iiitem{\@item3}
-\def\@item#1#2{%
-	\par \hangafter=0 \hangindent=#1\item@indent
-	\noindent\llap{\rm#2\enspace}\ignorespaces}
 
-\def\narrowerby#1{%
-	\advance \leftskip  by #1%
-	\advance \rightskip by #1}
+%%% VERBATIM %%%
 
-% Spread tokens in #1 by glue in #2.
-\def\spread#1#2{%
-	\def\@terminator##1\@help{}%
-	\def\@help##1{##1\hskip#2\relax\@help}%
-	\@help#1\@terminator\unskip}
-
-% General purpose verbatim. Usage:
+% Usage:
 %   \iverb <arbitrary local initialization> \verb<<an arbitrary delimiter
 %   {this} %is
 %		$all$ ~verbatim--
@@ -446,19 +481,19 @@
 %   Back to non-verbatim.
 % \verbpenalty is inserted between lines.
 \def\iverb{\begingroup}
-\def\@verbterm{\errmessage{verb delimiter should be on new line}}
-\def\@verbeol{%
-	\ifx\@verbnext\@verbterm% End of verbatim?
-		\let\@verbterm=\relax% Silence error message.
+\def\verb@term{\errmessage{verb delimiter should be on new line}}
+\def\verb@eol{%
+	\ifx\verb@next\verb@term% End of verbatim?
+		\let\verb@term=\relax% Silence error message.
 	\else
 		\penalty\verbpenalty
 	\fi}
 {\obeylines\gdef\verb{%
 	\def\@verb<<##1^^M{% Scan delimiter like Unix here doc.
-		\long\def\@@verb####1##1{####1\@verbterm\endgroup}%
+		\long\def\@@verb####1##1{####1\verb@term\endgroup}%
 		\@@verb}%
 	\def\do##1{\catcode`##1=12 }\dospecials% Init specials
-	\def\par{\leavevmode \endgraf \futurelet\@verbnext\@verbeol}%
+	\def\par{\leavevmode \endgraf \futurelet\verb@next\verb@eol}%
 	\obeylines% Init lines
 	\verb@obeyspaces% Init spaces
 	\@verb}}
@@ -476,28 +511,10 @@
 	\verbpenalty=1000 \narrowerby{20pt} \parskip=0pt \expandtabs \tt
 	\verb<<EOF}
 
-% Zero pad a positive integer. E.g., \zeropad{000}{13} -> 013.
-% Idea from https://tex.stackexchange.com/a/412225/202281.
-\def\zeropad#1#2{{%
-	\ifnum1#1>1#2%
-		\zeropad{#1}{0#2}%
-	\else
-		#2%
-	\fi}}
 
-% From the TeXBook TOC.
-\def\diamondleaders{%
-	\ifodd\pc@lineno \kern-10pt \fi
-	\leaders\hbox to 20pt{%
-		\ifodd\pc@lineno \kern15pt \else \kern5pt \fi $\cdot$\hss}}
-
-% Same as plain raggedright, but 2em -> 3em, and it advances rightskip,
-% instead of setting it.
-\def\raggedright{%
-	\advance \rightskip by 0pt plus 3em
-	\spaceskip=0.3333em \xspaceskip=0.5em\relax}
-
+%%% PSEUDOCODE %%%
 % TODO alignment support
+
 \newcount\pc@penalty
 \newcount\pc@lineno
 \newbox\pc@comment
@@ -613,7 +630,8 @@
 \def\Mark#1{\edef#1{\the\pc@lineno}}
 \def\Markg{\global\Mark}
 
-% PDFTeX only stuff.
+
+%%% PDFTeX %%%
 \ifx\pdfoutput\@undefined \else
 
 % Insert pdf image.
@@ -659,7 +677,7 @@
 	\edef\@{\endgroup\noexpand\setcolorgrey{\grey}}%
 	\@\ignorespaces}
 
-\fi % PDFTeX only stuff.
+\fi % PDFTeX
 
 \catcode`@=12
 \endinput
