@@ -444,24 +444,35 @@
 %		$all$ ~verbatim--
 %   an arbitrary delimiter
 %   Back to non-verbatim.
+% \verbpenalty is inserted between lines.
 \def\iverb{\begingroup}
-% Like plain \obeyspaces, but use control spaces, not \space.
-{\obeyspaces\gdef\verb@obeyspaces{\let =\ \obeyspaces}}
+\def\@verbterm{\errmessage{verb delimiter should be on new line}}
+\def\@verbeol{%
+	\ifx\@verbnext\@verbterm% End of verbatim?
+		\let\@verbterm=\relax% Silence error message.
+	\else
+		\penalty\verbpenalty
+	\fi}
 {\obeylines\gdef\verb{%
 	\def\@verb<<##1^^M{% Scan delimiter like Unix here doc.
-		\long\def\@@verb####1##1{####1\endgroup}%
+		\long\def\@@verb####1##1{####1\@verbterm\endgroup}%
 		\@@verb}%
-	\def\do##1{\catcode`##1=12 }\dospecials                    % Init specials
-	\def\par{\leavevmode\endgraf\penalty\verbpenalty}\obeylines% Init lines
-	\verb@obeyspaces                                           % Init spaces
+	\def\do##1{\catcode`##1=12 }\dospecials% Init specials
+	\def\par{\leavevmode \endgraf \futurelet\@verbnext\@verbeol}%
+	\obeylines% Init lines
+	\verb@obeyspaces% Init spaces
 	\@verb}}
+
+% Like Plain TeX \obeyspaces, but use control spaces, not \space.
+{\obeyspaces\gdef\verb@obeyspaces{\let =\ \obeyspaces}}
 
 % Convert tabs into 4 spaces (for code listings).
 {\catcode`\^^I=13
 \gdef\expandtabs{\catcode`\^^I=13\def^^I{\ \ \ \ }}}
 
-% Start code block. Terminate with "EOF".
-\def\code{\par\iverb
+% Start code block. Terminate with "EOF" (hence, this is not suitable for code
+% that literally contains "EOF").
+\def\code{\par \@medbreak \iverb \aftergroup\@medskip \aftergroup\noparskip
 	\verbpenalty=1000 \narrowerby{20pt} \parskip=0pt \expandtabs \tt
 	\verb<<EOF}
 
