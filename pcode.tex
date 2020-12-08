@@ -1,0 +1,152 @@
+% Depends on defs.tex.
+\catcode`@=11
+
+\ifx\@pcodeloaded\relax
+	\immediate\write16{pcode.tex: warning: loaded multiple times}
+	\expandafter\endinput
+\else
+	\let\@pcodeloaded=\relax
+\fi
+
+% TODO alignment support
+% TODO: small stretch in parskip/interline glue to allow algorithm to fit page
+
+\newcount\pctopbotpenalty \pctopbotpenalty=-200
+\newcount\pcstmtpenalty   \pcstmtpenalty=100
+\newcount\pcclubpenalty   \pcclubpenalty=250
+\newcount\pcwidowpenalty  \pcwidowpenalty=250
+\newcount\pcinterpenalty  \pcinterpenalty=10000
+\newdimen\pchang          \pchang=30pt
+\newdimen\pcindent        \pcindent=20pt
+\newdimen\pclinenogap     \pclinenogap=5pt
+\newskip\pcsideskip       \pcsideskip=20pt
+\newskip\pctopbotskip     \pctopbotskip=\bigskipamount
+
+\newcount\pc@penalty % Inter-statement penalty.
+\newcount\pc@lineno
+\newbox\pc@comment % Contains comment for next statement.
+
+\def\pckwskip{\hskip0.5em\relax}
+\def\pckwkern{\kern.16667em }
+
+\def\pclinenofmt{00}
+
+\def\beginpcode{%
+	\par\begingroup
+	\parskip=0pt
+	\narrowerby\pcsideskip
+	\raggedright
+	\mathsurround=0pt
+	\clubpenalty=0 \widowpenalty=0 \interlinepenalty=\pcinterpenalty
+	\hyphenpenalty=10000 \exhyphenpenalty=10000
+	\everypar={\pc@state}%
+	\setbox0=\hbox{$\ssty\pclinenofmt$\kern\pclinenogap}%
+	\parindent=\wd0
+	\pc@penalty=0 \pc@lineno=0 \setbox\pc@comment=\box\voidb@x
+	\@penalty\pctopbotpenalty \@vskip\pctopbotskip
+	\pc@dorule\kern2pt }
+
+\def\endpcode{%
+	\kern2pt \pc@dorule
+	\@penalty\pctopbotpenalty \@vskip\pctopbotskip
+	\endgroup \noparskip}
+
+\def\pc@dorule{%
+	\nointerlineskip
+	\hbox to \hsize{%
+		\hskip\leftskip
+		\kern-2pt
+		\@dimen=\hsize
+		\advance \@dimen by -\leftskip
+		\advance \@dimen by -\rightskip
+		\advance \@dimen by 4pt
+		\vrule height0.4pt width\@dimen
+		\kern-2pt
+		\hskip\rightskip}%
+	\nointerlineskip}
+
+\def\pc@addpenalty{\advance \pc@penalty by}
+\def\pc@emitpenalty{\ifnum\pc@penalty>0 \penalty\pc@penalty \pc@penalty=0 \fi}
+
+\def\pc@enter{\advance \parindent by \pcindent}
+\def\pc@exit{\advance \parindent by -\pcindent}
+
+\def\pc@state#1;{%
+	\pc@emitpenalty
+	\hangafter=1 \hangindent=\parindent \advance \hangindent by \pchang
+	\advance \pc@lineno by 1
+	\llap{\hbox to\parindent{%
+		$\ssty\zeropad{\pclinenofmt}{\number\pc@lineno}$\hss}}%
+	% The struts assure the surrounding rules are spaced well.
+	\strut#1\strut
+	\ifvoid\pc@comment \else
+		\nobreak\hfil\hbox{}\hskip0.5em plus1fil \hbox{}\nobreak\hfill
+		\box\pc@comment% pc@comment now void.
+	\fi
+	\par
+	\pc@addpenalty\pcstmtpenalty}
+
+\def\State{\leavevmode}
+
+\def\Func#1(#2){%
+	\Kw{function}\pckwskip\Name{#1}(#2);
+	\pc@addpenalty\pcclubpenalty
+	\pc@enter}
+
+\def\If#1\Then{%
+	\Kw{if}\pckwskip#1\unskip\pckwskip\Kw{then};
+	\pc@addpenalty\pcclubpenalty
+	\pc@enter}
+\def\Elseif#1\Then{%
+	\pc@exit
+	\pc@addpenalty\pcwidowpenalty
+	\Kw{else\pckwkern if}\pckwskip#1\unskip\pckwskip\Kw{then};
+	\pc@addpenalty\pcclubpenalty
+	\pc@enter}
+\def\Else{%
+	\pc@exit
+	\pc@addpenalty\pcwidowpenalty
+	\Kw{else};
+	\pc@addpenalty\pcclubpenalty
+	\pc@enter}
+
+\def\For$#1$#2\From$#3$#4\To$#5$#6\Do{%
+	\Kw{for}\pckwskip$#1 \Gets #3$\pckwskip
+	\Kw{to}\pckwskip$#5$\unskip\pckwskip\Kw{do};
+	\pc@addpenalty\pcclubpenalty
+	\pc@enter}
+
+\def\Foreach#1\In#2\Do{%
+	\Kw{for\pckwkern each}\pckwskip#1\unskip\pckwskip
+	\Kw{in}\pckwskip#2\unskip\pckwskip\Kw{do};
+	\pc@addpenalty\pcclubpenalty
+	\pc@enter}
+
+\def\While#1\Do{%
+	\Kw{while}\pckwskip#1\unskip\pckwskip\Kw{do};
+	\pc@addpenalty\pcclubpenalty
+	\pc@enter}
+
+\def\End{%
+	\pc@exit
+	\pc@addpenalty\pcwidowpenalty
+	\Kw{end};}
+
+\def\Return{\Kw{return}\pckwskip}
+\def\Comment#1{\setbox\pc@comment=\hbox{$\triangleright$ #1}}
+
+\def\Kw#1{\leavevmode{\bf #1}}
+\def\Id#1{\leavevmode{\it #1}}
+\def\Name#1{\leavevmode{\sc #1}}
+\def\Call#1(#2){\leavevmode\hbox{\Name{#1}(#2)}}
+\def\And{\unskip\pckwskip\Kw{and}\pckwskip}
+\def\Or{\unskip\pckwskip\Kw{or}\pckwskip}
+\def\Gets{\mathrel{\mathop:}\mathrel=}
+\def\True{{\rm true}}
+\def\False{{\rm false}}
+
+\def\Mark#1{\edef#1{\the\pc@lineno}}
+\def\Markg{\global\Mark}
+
+\catcode`@=12
+\endinput
