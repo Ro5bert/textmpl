@@ -7,6 +7,9 @@
 \else
 	\let\@pcodeloaded=\relax
 \fi
+\ifx\@defsloaded\relax \else
+	\errmessage{defs.tex must be loaded before pcode.tex}
+\fi
 
 % TODO alignment support
 % TODO: small stretch in parskip/interline glue to allow algorithm to fit page
