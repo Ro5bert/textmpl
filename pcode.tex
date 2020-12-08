@@ -37,6 +37,9 @@
 \def\beginpcode{%
 	\par\begingroup
 	\parskip=0pt
+	\normalbaselines
+	\advance \baselineskip by 0pt plus1pt % This helps long algorithms
+	\advance \lineskip by 0pt plus1pt     % fit the page.
 	\narrowerby\pcsideskip
 	\raggedright
 	\mathsurround=0pt
