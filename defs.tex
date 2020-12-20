@@ -429,6 +429,23 @@
 \def\msupimp{\msupimpmap
 	{\mapfour{\dsty\dsty}{\tsty\tsty}{\ssty\ssty}{\sssty\sssty}}}
 
+% Boxed computer-sciency arrays
+% Example usage (in math mode):
+%   \narray\\{17}\\{39}\\{14} \;\cdots\; \advance\arrcnt by22 \array\\{7}
+\newcount\arrcnt \arrcnt=0
+\newdimen\arrlen \arrlen=20pt
+\newif\ifdonecell
+\def\narray{\let\@arrconv=\the  \arrcnt=0  \array}% 0, 1, 2, ...
+\def\uarray{\let\@arrconv=\char \arrcnt=65 \array}% A, B, C, ...
+\def\larray{\let\@arrconv=\char \arrcnt=97 \array}% a, b, c, ...
+\def\array{\donecellfalse \let\\=\arraycell}
+\def\arraycell#1{%
+	\ifdonecell \kern-0.4pt \else \donecelltrue \fi
+	\vcenter{\advance \arrlen by0.8pt \hbox to\arrlen{\hss$\m@th#1$\hss}}%
+	\mathllap{\mathop{\rect\arrlen\arrlen{0.4pt}}\limits^{\@arrconv\arrcnt}}%
+	\advance \arrcnt by1 }
+\let\@arrconv=\the
+
 
 %%% PROBLEMS %%%
 % TODO allow breaking problem statements across pages.
