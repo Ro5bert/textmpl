@@ -399,8 +399,8 @@
 \def\rising#1#2{#1^{\overline{#2}}}
 \def\rect#1#2#3{% inner width, inner height, line thickness 
 	\vcenter{\vbox{%
-		\hrule height#3
-		\hbox{\vrule width#3 height#2 \kern#1 \vrule width#3}%
+		\hrule height#3%
+		\hbox{\vrule width#3height#2\kern#1\vrule width#3}%
 		\hrule height#3}}}
 
 % TODO this is weird; get rid of it.
