@@ -433,13 +433,14 @@
 % possible to make boxed matrices.
 % Boxed computer-sciency arrays
 % Example usage (in math mode):
-%   \narray\\{17}\\{39}\\{14} \;\cdots\; \advance\arrcnt by22 \array\\{7}
+%   \narray\\{17}\\{39}\\{14} \;\cdots\; \array\arri{n}\\{7}
 \newcount\arrcnt \arrcnt=0
 \newdimen\arrlen \arrlen=20pt
 \newif\ifdonecell
 \def\narray{\let\@arrconv=\the  \arrcnt=0  \array}% 0, 1, 2, ...
 \def\uarray{\let\@arrconv=\char \arrcnt=65 \array}% A, B, C, ...
 \def\larray{\let\@arrconv=\char \arrcnt=97 \array}% a, b, c, ...
+\def\arri#1{\def\@arrconv##1{#1}}
 \def\array{\donecellfalse \let\\=\arraycell}
 \def\arraycell#1{%
 	\ifdonecell \kern-0.4pt \else \donecelltrue \fi
