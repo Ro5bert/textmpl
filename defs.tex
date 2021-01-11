@@ -429,6 +429,8 @@
 \def\msupimp{\msupimpmap
 	{\mapfour{\dsty\dsty}{\tsty\tsty}{\ssty\ssty}{\sssty\sssty}}}
 
+% TODO: support vertical arrays too. Then, combining the two, it should be
+% possible to make boxed matrices.
 % Boxed computer-sciency arrays
 % Example usage (in math mode):
 %   \narray\\{17}\\{39}\\{14} \;\cdots\; \advance\arrcnt by22 \array\\{7}
@@ -460,7 +462,9 @@
 \def\part{\@phdr\tenbf}
 \def\@phdr#1.{%
 	\ifnum\p@last=2 \@endpstmt \else \par \fi
-	\ifnum\p@last=0 \vskip 0pt plus100pt \penalty0 \vskip 0pt plus-100pt \fi
+	\ifnum\p@last=0
+		\vskip 0pt plus.3\vsize \penalty0 \vskip 0pt plus-.3\vsize
+	\fi
 	\ifnum\p@last<2 \nobreak\vskip\prob@topskip \fi
 	\nointerlineskip\hbox{#1}%
 	\p@last=1}
