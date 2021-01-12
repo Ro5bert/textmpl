@@ -435,9 +435,7 @@
 \def\msupimp{\msupimpmap
 	{\mapfour{\dsty\dsty}{\tsty\tsty}{\ssty\ssty}{\sssty\sssty}}}
 
-% TODO: support vertical arrays too. Then, combining the two, it should be
-% possible to make boxed matrices.
-% Boxed computer-sciency arrays
+% Boxed computer-sciency arrays and matrices
 % Example usage (in math mode):
 %   \narray\\{17}\\{39}\\{14} \;\cdots\; \array\arri{n}\\{7}
 \newcount\arrcnt \arrcnt=0
@@ -450,11 +448,20 @@
 \def\larray{\let\@arrconv=\char \arrcnt=97 \array}% a, b, c, ...
 \def\arri#1{\def\@arrconv##1{#1}}
 \def\array{\donecellfalse \let\\=\arraycell}
+\def\@arrmcell{\@mcell\arrlen\arrlen}
+\let\@arrconv=\the
 \def\arraycell#1{%
 	\ifdonecell \kern-0.4pt \else \donecelltrue \fi
-	\mathord{\mathop{\@mcell\arrlen\arrlen{#1}}\limits^{\@arrconv\arrcnt}}%
+	\mathord{\mathop{\@arrmcell{#1}}\limits^{\@arrconv\arrcnt}}%
 	\advance \arrcnt by1 }
-\let\@arrconv=\the
+\def\boxmat#1{\vbox{%
+	\offinterlineskip
+	\everycr{\noalign{\kern-0.4pt}}%
+	\tabskip=0pt
+	\kern0.4pt
+	\halign{$\m@th\@arrmcell{##}$&&\kern-0.4pt$\m@th\@arrmcell{##}$\crcr
+		#1\crcr}%
+	\kern0.4pt}}
 
 
 %%% PROBLEMS %%%
