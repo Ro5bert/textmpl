@@ -306,6 +306,9 @@
 % Plain TeX only provides llap and rlap.
 \def\clap#1{\hbox to 0pt{\hss#1\hss}}
 
+% Surround content, which should be a box, with rules.
+\def\vboxit#1{\vbox{\hrule\hbox{\vrule#1\vrule}\hrule}}
+
 % Same as plain raggedright, but 2em changed to 3em, and it advances rightskip,
 % instead of setting it.
 \def\raggedright{%
@@ -403,6 +406,9 @@
 		\hbox{\vrule width#3height#2\kern#1\vrule width#3}%
 		\hrule height#3}}}
 
+\def\mvstrut#1{\vcenter{\hrule width0pt height#1}}
+\def\mhstrut#1{\vcenter{\hrule width#1 height0pt}}
+
 % TODO this is weird; get rid of it.
 % mappalette is like mathpalette, except instead of the first argument to the
 % given CS being the current math style, it is whatever the given mapfour maps
@@ -437,6 +443,8 @@
 \newcount\arrcnt \arrcnt=0
 \newdimen\arrlen \arrlen=20pt
 \newif\ifdonecell
+\def\@mcell#1#2#3{\vcenter{\vboxit{\hbox to#1{%
+	\hss$\m@th\mvstrut{#2}\smash{\vcenter{\hbox{$\m@th#3$}}}$\hss}}}}
 \def\narray{\let\@arrconv=\the  \arrcnt=0  \array}% 0, 1, 2, ...
 \def\uarray{\let\@arrconv=\char \arrcnt=65 \array}% A, B, C, ...
 \def\larray{\let\@arrconv=\char \arrcnt=97 \array}% a, b, c, ...
@@ -444,8 +452,7 @@
 \def\array{\donecellfalse \let\\=\arraycell}
 \def\arraycell#1{%
 	\ifdonecell \kern-0.4pt \else \donecelltrue \fi
-	\vcenter{\advance \arrlen by0.8pt \hbox to\arrlen{\hss$\m@th#1$\hss}}%
-	\mathllap{\mathop{\rect\arrlen\arrlen{0.4pt}}\limits^{\@arrconv\arrcnt}}%
+	\mathord{\mathop{\@mcell\arrlen\arrlen{#1}}\limits^{\@arrconv\arrcnt}}%
 	\advance \arrcnt by1 }
 \let\@arrconv=\the
 
