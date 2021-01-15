@@ -304,7 +304,7 @@
 	\@help#1\@terminator\unskip}
 
 % Plain TeX only provides llap and rlap.
-\def\clap#1{\hbox to 0pt{\hss#1\hss}}
+\def\clap#1{\hbox to0pt{\hss#1\hss}}
 
 % Surround content, which should be a box, with rules.
 \def\vboxit#1{\vbox{\hrule\hbox{\vrule#1\vrule}\hrule}}
@@ -446,13 +446,15 @@
 \def\narray{\let\@arrconv=\the  \arrcnt=0  \array}% 0, 1, 2, ...
 \def\uarray{\let\@arrconv=\char \arrcnt=65 \array}% A, B, C, ...
 \def\larray{\let\@arrconv=\char \arrcnt=97 \array}% a, b, c, ...
+\def\earray{\let\@arrconv=\relax \arrcnt=0 \array}% No labels
 \def\arri#1{\def\@arrconv##1{#1}}
 \def\array{\donecellfalse \let\\=\arraycell}
 \def\@arrmcell{\@mcell\arrlen\arrlen}
-\let\@arrconv=\the
+\let\@arrconv=\relax
 \def\arraycell#1{%
 	\ifdonecell \kern-0.4pt \else \donecelltrue \fi
-	\mathord{\mathop{\@arrmcell{#1}}\limits^{\@arrconv\arrcnt}}%
+	\mathord{\mathop{\@arrmcell{#1}}\limits
+		\ifx\@arrconv\relax \else ^{\@arrconv\arrcnt} \fi}
 	\advance \arrcnt by1 }
 \def\boxmat#1{\vbox{%
 	\offinterlineskip
