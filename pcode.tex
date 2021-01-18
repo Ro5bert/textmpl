@@ -1,5 +1,5 @@
 % Depends on defs.tex.
-\catcode`@=11
+\catcode`\@=11
 
 \ifx\@pcodeloaded\relax
 	\immediate\write16{pcode.tex: warning: loaded multiple times}
@@ -153,5 +153,5 @@
 \def\Mark#1{\edef#1{\the\pc@lineno}}
 \def\Markg{\global\Mark}
 
-\catcode`@=12
+\catcode`\@=12
 \endinput
