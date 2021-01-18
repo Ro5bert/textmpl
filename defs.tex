@@ -38,6 +38,34 @@
 \def\@hextodec#1#2#3#4#5{%
 	\@htddimen="#2#3#4#5sp \edef#1{\ea\@strippt\the\@htddimen}}
 
+% defer and edefer are for defering execution of the given tokens until after
+% the current group. edefer is the same as defer, except edefer expands the
+% given tokens first (in the same way edef does).
+% Note: a defer can't contain more than 1 "child" defer.
+% E.g., \defer{A\defer{B\defer{C}}} is ok, but not \defer{A\defer{B}\defer{C}}.
+\newcount\defercnt \defercnt=0
+\def\@defer#1#2{%
+	\ea#1\csname$defer\the\defercnt\endcsname{#2}%
+	\ea\aftergroup\csname$defer\the\defercnt\endcsname
+	\advance\defercnt1 }
+\def\defer{\@defer\gdef}
+\def\edefer{\@defer\xdef}
+
+% \savethe restores the current value of the given \the-expandable "variable"
+% (e.g., a register) at the end of the current group. This allows one to
+% modify a variable globally, yet still have it's value be restored.
+\def\savethe#1{\ea\defer\ea{\ea#1\the#1}}
+
+% \saveif is like \savethe, but for boolean variables defined via \newif.
+\def\saveif#1{%
+	\def\@saveiftrue{\defer{\let#1=\iftrue}}%
+	\def\@saveiffalse{\defer{\let#1=\iffalse}}%
+	#1\@saveiftrue\else\@saveiffalse\fi}
+
+% \ascend causes the following local assignment to "ascend" up one level of
+% grouping. E.g., \ascend\count0=3 changes \count0 to 3 locally and in the
+% immediately surrounding group.
+\def\ascend#1={\def\@ascend{\savethe{#1}}\afterassignment\@ascend#1=}
 
 %%% PARAMETERS/REGISTER ALLOCATION %%%
 
