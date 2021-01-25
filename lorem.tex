@@ -1,0 +1,24 @@
+\catcode`\@=11
+\def\lorem#1\to{\begingroup \@count=#1 \afterassignment\@lorem \@@count=}
+\def\@lorem{%
+	\ifnum\@count>\@@count \errmessage{lorem.tex: negative range}\fi
+	\ifnum\@@count>150 \errmessage{lorem.tex: too many paragraphs (max 150)}\fi
+	\ifnum\@count<0 \errmessage{lorem.tex: negative paragraphs}\fi
+	\let\par=\@lorempar
+	\input loremtext
+	\endgroup}
+\def\@lorempar{%
+	\ifnum\@count>0
+		\advance\@count by-1
+		\advance\@@count by-1
+		\expandafter\@gobblepar
+	\else
+		\endgraf
+		\ifnum\@@count>0
+			\advance\@@count by-1
+		\else
+			\endinput
+		\fi
+	\fi}
+\def\@gobblepar#1\par{\par}
+\catcode`\@=12
