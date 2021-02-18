@@ -23,8 +23,6 @@
 % TODO: more general font switch macros, e.g., do \fswap11 to switch to 11pt or
 %   something (\eleventpt is akward name)
 % TODO: more general figure macros (with caption support)?
-% TODO: increase prob topskip? 16 plus6 minus6?
-% TODO: rename mathxlap -> mxlap
 
 \ifx\@defsloaded\relax
 	\immediate\write16{defs.tex: warning: loaded multiple times}
@@ -95,7 +93,7 @@
 
 %%% PARAMETERS/REGISTER ALLOCATION %%%
 
-% \parindent, prob@sidesize, item@indent, and pc@sideskip should
+% \parindent, \prob@sidesize, \iind, and \pc@sideskip should
 % be kept in sync so that indentations look consistent.
 
 \parindent=0pt
@@ -105,8 +103,7 @@
 \newcount\verbpenalty   \verbpenalty=0
 \newdimen\prob@sidesize \prob@sidesize=20pt
 \newdimen\prob@rulegap  \prob@rulegap=5pt
-\newskip\prob@topskip   \prob@topskip=12pt plus6pt minus2pt
-\newdimen\item@indent   \item@indent=20pt
+\newskip\prob@topskip   \prob@topskip=16pt plus6pt minus6pt
 
 % Registers for temporary use.
 \newcount\@count \newcount\@@count
