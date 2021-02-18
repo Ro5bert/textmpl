@@ -1,5 +1,28 @@
 \catcode`\@=11
 
+% TODO: pdftex wrapper that adds include path for defs.tex (so I don't have to
+%  copy it eveywhere) and, on success, creates a file in the CWD with the
+%  git commit hash of the version of defs.tex that was compatible
+% TODO: add exalign macro from MATH212 A1
+% TODO: genericize \verb macro by making begining and end of line tokens
+%   arbitrary (see CSC349A A1)
+% TODO: digit alignment macros from csc349a a1?
+% TODO: new fonts from ENGR240
+% TODO: check if non-scaled fonts are pixelated... some MF fonts are
+% TODO: insertion macros that use \@vskip macros
+% TODO: play with idea of locally redefining \end for various
+%  "environment-style" macros (pcode, prob, etc.)
+% TODO: lorem should not start new paragraph?
+% TODO: macro for changing abovedisplayshortskip/abovedisaplayskip at the same
+%   time
+% TODO: put \relax in each of \rm,\bf,etc., in case they are first in halign entry.
+% TODO: \page macro?
+% TODO: general section macros with parametric fonts (plaintex beginsection
+%   sucks): see engr240 memo
+% TODO: more general font switch macros, e.g., do \fswap11 to switch to 11pt or
+%   something (\eleventpt is akward name)
+% TODO: more general figure macros (with caption support)?
+
 \ifx\@defsloaded\relax
 	\immediate\write16{defs.tex: warning: loaded multiple times}
 	\expandafter\endinput
@@ -105,7 +128,7 @@
 %  7 = tt             (10//)
 
 % Misc fonts
-\font\bigbf=cmbx12 scaled \magstep1 % Title.
+\font\bigbf=cmbx12 scaled\magstep1 % Title.
 \font\twelvebf=cmbx12 % Problem headings.
 
 \font\ninerm=cmr9
@@ -309,14 +332,24 @@
 
 %%% TEXT %%%
 
-% Lists, with dedicated macros for up to 3 levels of nesting.
-\let\itemitem=\@undefined
-\def\item{\@item1}
-\def\iitem{\@item2}
-\def\iiitem{\@item3}
-\def\@item#1#2{%
-	\par \hangafter=0 \hangindent=#1\item@indent
-	\noindent\llap{\rm#2\enspace}\ignorespaces}
+% Lists. Indent by iind*ilvl + ioff, where ilvl is incremented per nest level.
+% Derive bullet from ifmt based on icnt, which is incremented per item.
+\newcount\icnt
+\newcount\ilvl \ilvl=0
+\newdimen\iind \iind=20pt
+\newdimen\ioff \ioff=0pt
+\let\ifmt=\@undefined
+\def\@blist{$\bullet$\enspace}
+\def\@nlist{{\rm\the\icnt.}\enspace}
+\def\@clist{{\rm\char\icnt.}\enspace}
+\def\blist{\let\ifmt=\@blist \icnt=0  \advance\ilvl1}
+\def\nlist{\let\ifmt=\@nlist \icnt=0  \advance\ilvl1}
+\def\ulist{\let\ifmt=\@clist \icnt=64 \advance\ilvl1}
+\def\llist{\let\ifmt=\@clist \icnt=96 \advance\ilvl1}
+\def\item{\par \advance\icnt1 \global\hangafter=0
+	\global\hangindent=\iind \global\multiply\hangindent\ilvl
+	\global\advance\hangindent\ioff \noindent\llap{\ifmt}\ignorespaces}
+\let\itemitem=\@undefined% Undefine macro from plain tex.
 
 % Like Plain TeX narrower, but advance left/rightskip by specified ammount
 % instead of by parindent.
