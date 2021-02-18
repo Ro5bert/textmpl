@@ -3,8 +3,6 @@
 % TODO: pdftex wrapper that adds include path for defs.tex (so I don't have to
 %  copy it eveywhere) and, on success, creates a file in the CWD with the
 %  git commit hash of the version of defs.tex that was compatible
-% TODO: add exalign macro from MATH212 A1 q7 with \centering
-% TODO: add interject macro from MATH212 A1 q7
 % TODO: genericize \verb macro by making begining and end of line tokens
 %   arbitrary (see CSC349A A1)
 % TODO: digit alignment macros from csc349a a1?
@@ -425,6 +423,22 @@
 \def\@intkern{\mkern-9mu\mathchoice{\mkern-5mu}{}{}{}}
 \def\iint{\int\@intkern\int\nolimits}
 \def\iiint{\int\@intkern\int\@intkern\int\nolimits}
+
+% eqalignno, but you can add an explaination to each line.
+\def\exalignno#1{\vcenter{\displ@y \tabskip=\centering
+	\halign to\displaywidth{%
+		\hfil$\@lign\dsty{##}$\tabskip=0pt&$\@lign\dsty{{}##}$\hfil&
+		\qquad\hbox{\rm##}\hfil\tabskip=\centering&
+		\llap{$\@lign##$}\tabskip=0pt\crcr #1\crcr}}}
+
+% Add a paragraph (or arbitrary vertical material) into the middle of an
+% eqalignno/exalignno. Works best if \hsize == \displaywidth.
+% This always surrounds the interjecting text with belowdisplayskip and
+% abovedisplayskip, respectively, which might look bad in situations where
+% TeX would have chosen the short variants of those skips. In such cases,
+% manual adjustments may be required.
+\def\interject#1{\noalign{\vskip\belowdisplayskip\vbox{%
+	\hsize=\displaywidth \normalbaselines #1}\vskip\abovedisplayskip}}
 
 % For \sums mainly. This just sticks .25ex between lines,
 % which seems to work well enough.
