@@ -21,6 +21,7 @@
 % TODO: more general font switch macros, e.g., do \fswap11 to switch to 11pt or
 %   something (\eleventpt is akward name)
 % TODO: more general figure macros (with caption support)?
+% TODO: play arround with making slides with \special{papersize}/pdftex
 
 \ifx\@defsloaded\relax
 	\immediate\write16{defs.tex: warning: loaded multiple times}
@@ -88,6 +89,7 @@
 % grouping. E.g., \ascend\count0=3 changes \count0 to 3 locally and in the
 % immediately surrounding group.
 \def\ascend#1={\def\@ascend{\savethe{#1}}\afterassignment\@ascend#1=}
+
 
 %%% PARAMETERS/REGISTER ALLOCATION %%%
 
@@ -425,11 +427,11 @@
 \def\iiint{\int\@intkern\int\@intkern\int\nolimits}
 
 % eqalignno, but you can add an explaination to each line.
-\def\exalignno#1{\vcenter{\displ@y \tabskip=\centering
+\def\exalignno#1{\displ@y \tabskip=\centering
 	\halign to\displaywidth{%
 		\hfil$\@lign\dsty{##}$\tabskip=0pt&$\@lign\dsty{{}##}$\hfil&
 		\qquad\hbox{\rm##}\hfil\tabskip=\centering&
-		\llap{$\@lign##$}\tabskip=0pt\crcr #1\crcr}}}
+		\llap{$\@lign##$}\tabskip=0pt\crcr #1\crcr}}
 
 % Add a paragraph (or arbitrary vertical material) into the middle of an
 % eqalignno/exalignno. Works best if \hsize == \displaywidth.
