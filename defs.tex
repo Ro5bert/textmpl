@@ -415,12 +415,12 @@
 \let\del=\partial
 
 % https://www.tug.org/TUGboat/tb22-4/tb72perlS.pdf
-\def\mathllap{\mathpalette\@mathllapinternal}
-\def\mathrlap{\mathpalette\@mathrlapinternal}
-\def\mathclap{\mathpalette\@mathclapinternal}
-\def\@mathllapinternal#1#2{\llap{$\m@th#1{#2}$}}
-\def\@mathrlapinternal#1#2{\rlap{$\m@th#1{#2}$}}
-\def\@mathclapinternal#1#2{\clap{$\m@th#1{#2}$}}
+\def\mllap{\mathpalette\@mllap}
+\def\mrlap{\mathpalette\@mrlap}
+\def\mclap{\mathpalette\@mclap}
+\def\@mllap#1#2{\llap{$\m@th#1{#2}$}}
+\def\@mrlap#1#2{\rlap{$\m@th#1{#2}$}}
+\def\@mclap#1#2{\clap{$\m@th#1{#2}$}}
 
 % Integrals
 \def\d{{\rm d}} % Preceed with \, usually.
