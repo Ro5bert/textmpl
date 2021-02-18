@@ -3,7 +3,8 @@
 % TODO: pdftex wrapper that adds include path for defs.tex (so I don't have to
 %  copy it eveywhere) and, on success, creates a file in the CWD with the
 %  git commit hash of the version of defs.tex that was compatible
-% TODO: add exalign macro from MATH212 A1
+% TODO: add exalign macro from MATH212 A1 q7 with \centering
+% TODO: add interject macro from MATH212 A1 q7
 % TODO: genericize \verb macro by making begining and end of line tokens
 %   arbitrary (see CSC349A A1)
 % TODO: digit alignment macros from csc349a a1?
@@ -22,6 +23,8 @@
 % TODO: more general font switch macros, e.g., do \fswap11 to switch to 11pt or
 %   something (\eleventpt is akward name)
 % TODO: more general figure macros (with caption support)?
+% TODO: increase prob topskip? 16 plus6 minus6?
+% TODO: rename mathxlap -> mxlap
 
 \ifx\@defsloaded\relax
 	\immediate\write16{defs.tex: warning: loaded multiple times}
@@ -432,8 +435,9 @@
 	\baselineskip=-1000pt \lineskip=.25ex \lineskiplimit=\maxdimen
 	\ialign{\hfil$\ssty##$\hfil\crcr#1\crcr}}}
 
-% \imp to match \iff.
-\def\imp{\;\Longrightarrow\;}
+% Missing from plain tex.
+\def\imp{\;\Longrightarrow\;}% To match \iff.
+\def\lcm{\mathop{\rm lcm}}% To match \gcd.
 
 % Sets
 \def\N{{\bb N}}
@@ -467,6 +471,7 @@
 		\hbox{\vrule width#3height#2\kern#1\vrule width#3}%
 		\hrule height#3}}}
 
+% TODO weird
 \def\mvstrut#1{\vcenter{\hrule width0pt height#1}}
 \def\mhstrut#1{\vcenter{\hrule width#1 height0pt}}
 
