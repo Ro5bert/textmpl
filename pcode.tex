@@ -1,15 +1,8 @@
-% Depends on defs.tex.
 \catcode`\@=11
 
-\ifx\@pcodeloaded\relax
-	\immediate\write16{pcode.tex: warning: loaded multiple times}
-	\expandafter\endinput
-\else
-	\let\@pcodeloaded=\relax
-\fi
-\ifx\@defsloaded\relax \else
-	\errmessage{defs.tex must be loaded before pcode.tex}
-\fi
+\csname input:pcode.tex\endcsname
+\expandafter\let\csname input:pcode.tex\endcsname=\endinput
+\input defs
 
 % TODO alignment support
 

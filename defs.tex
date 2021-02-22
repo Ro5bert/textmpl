@@ -25,20 +25,16 @@
 % TODO: use a different char from plain tex for private macros? E.g., * or !
 % TODO: play with \def\sel#1/#2/{} macro idea (select #1-th token out of #2)
 % TODO: extension fonts at different sizes
-% TODO: latin modern
 % TODO: lipsum: option for long, medium, short paragraphs?
 % TODO: \defsrc and \cite macros
 % TODO: terser reinput protection using \csname autodef to \relax feature
 % TODO: revise \@vskip: insert the @penalty + glue if the old penalty is larger
 %   than new penalty?
-% TODO: for and foreach loop macros
+% TODO: consider footline/headline during font changes
+% TODO: comment that macros are allowed to clobber \@, \@@, etc.
 
-\ifx\@defsloaded\relax
-	\immediate\write16{defs.tex: warning: loaded multiple times}
-	\expandafter\endinput
-\else
-	\let\@defsloaded=\relax
-\fi
+\csname input:defs.tex\endcsname
+\expandafter\let\csname input:defs.tex\endcsname=\endinput
 
 
 %%% DEBUGGING/TESTING %%%
