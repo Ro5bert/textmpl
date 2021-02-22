@@ -22,6 +22,16 @@
 %   something (\eleventpt is akward name)
 % TODO: more general figure macros (with caption support)?
 % TODO: play arround with making slides with \special{papersize}/pdftex
+% TODO: use a different char from plain tex for private macros? E.g., * or !
+% TODO: play with \def\sel#1/#2/{} macro idea (select #1-th token out of #2)
+% TODO: extension fonts at different sizes
+% TODO: latin modern
+% TODO: lipsum: option for long, medium, short paragraphs?
+% TODO: \defsrc and \cite macros
+% TODO: terser reinput protection using \csname autodef to \relax feature
+% TODO: revise \@vskip: insert the @penalty + glue if the old penalty is larger
+%   than new penalty?
+% TODO: for and foreach loop macros
 
 \ifx\@defsloaded\relax
 	\immediate\write16{defs.tex: warning: loaded multiple times}
@@ -44,8 +54,24 @@
 \let\ea=\expandafter
 
 \def\@gobble#1{}
+\def\@gobbleto#1{\begingroup\def\@gobble##1#1{\endgroup}\@gobble}
 \def\1#1#2{#1} % I.e., firstoftwo
 \def\2#1#2{#2} % I.e., secondoftwo
+
+\newcount\@fori
+\newcount\@form
+\def\@foru{\ifnum\@fori<\@form \@forbody\advance\@fori 1 \ea\@foru \fi}
+\def\@ford{\ifnum\@fori>\@form \@forbody\advance\@fori-1 \ea\@ford \fi}
+\def\for#1=#2..#3\do#4{{%
+	\let#1=\@fori \@fori=#2\relax \futurelet\@foreq\@form#3\relax
+	\def\@forbody{#4}%
+	\ifnum\@fori<\@form\@foru\else\@ford\fi
+	\if\@foreq=\@forbody\fi}}
+
+\def\@foragain{\ifx\@next\relax \else \ea\@iter \fi}
+\def\foreach#1=#2\do#3{{%
+	\def\@iter##1,{\def#1{##1}#3\futurelet\@next\@foragain}%
+	\@iter#2,\relax}}
 
 % Zero pad a positive integer. E.g., \zeropad{000}{13} => 013.
 % Idea from https://tex.stackexchange.com/a/412225/202281.
