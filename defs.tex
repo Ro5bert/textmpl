@@ -5,7 +5,6 @@
 %  git commit hash of the version of defs.tex that was compatible
 % TODO: genericize \verb macro by making begining and end of line tokens
 %   arbitrary (see CSC349A A1)
-% TODO: digit alignment macros from csc349a a1?
 % TODO: insertion macros that use \@vskip macros
 % TODO: lorem should not start new paragraph?
 % TODO: \page macro?
@@ -339,6 +338,14 @@
 	\def\@terminator##1\@help{}%
 	\def\@help##1{##1\hskip#2\relax\@help}%
 	\@help#1\@terminator\unskip}
+
+{\catcode`\?=13
+\let\+=\@undefined% Plain TeX makes this an \outer def.
+\gdef\digalign{%
+	\catcode`\?=13 \def?{{\setbox0=\hbox{0}\kern\wd0}}%
+	\def\+{{\setbox0=\hbox{$\m@th-$}\kern\wd0}}%
+	\def\.{{\setbox0=\hbox{$\m@th.$}\kern\wd0}}}
+}
 
 % Plain TeX only provides llap and rlap.
 \def\clap#1{\hbox to0pt{\hss#1\hss}}
