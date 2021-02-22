@@ -330,9 +330,8 @@
 
 % Like Plain TeX narrower, but advance left/rightskip by specified ammount
 % instead of by parindent.
-\def\narrowerby#1{%
-	\advance \leftskip  by #1%
-	\advance \rightskip by #1}
+\def\@narrowerby{\advance\leftskip\@dimen \advance\rightskip\@dimen}
+\def\narrowerby{\afterassignment\@narrowerby \@dimen=}
 
 % Spread tokens in #1 by glue in #2.
 % E.g., "abcd" => "a  b  c  d".
@@ -611,7 +610,7 @@
 % Start code block. Terminate with "EOF" (hence, this is not suitable for code
 % that literally contains "EOF").
 \def\code{\par \@medbreak \iverb \aftergroup\@medskip \aftergroup\noparskip
-	\verbpenalty=1000 \narrowerby{20pt} \parskip=0pt \expandtabs \tt
+	\verbpenalty=1000 \narrowerby20pt \parskip=0pt \expandtabs \tt
 	\verb<<EOF}
 
 
