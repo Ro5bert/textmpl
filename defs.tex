@@ -3,6 +3,7 @@
 % TODO: pdftex wrapper that adds include path for defs.tex (so I don't have to
 %  copy it eveywhere) and, on success, creates a file in the CWD with the
 %  git commit hash of the version of defs.tex that was compatible
+
 % TODO: genericize \verb macro by making begining and end of line tokens
 %   arbitrary (see CSC349A A1)
 % TODO: insertion macros that use \@vskip macros
@@ -18,6 +19,7 @@
 %   than new penalty?
 % TODO: consider footline/headline during font changes
 % TODO: don't set parskip and parindent
+% TODO: automatic section/proclaim numbering
 
 \csname input:defs.tex\endcsname
 \expandafter\let\csname input:defs.tex\endcsname=\endinput
@@ -440,6 +442,7 @@
 \def\Z{{\bb Z}}
 \def\Q{{\bb Q}}
 \def\R{{\bb R}}
+\def\C{{\bb C}}
 \def\powset{{\sr P}}
 
 % Big O and friends
