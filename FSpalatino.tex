@@ -11,6 +11,8 @@
 \def\FSzplsupbtlf{zplsupbtlf=\\10:zplsups-Bold-t1;;}
 \def\FSzplsupbitlf{zplsupbitlf=\\10:zplsups-BoldItalic-t1;;}
 \def\FSzplitlfth{zplitlfth=\\10:zpl-Italic-tlf-th-t1;;}
+\def\FSpplro{pplro=\\10:pplro8t;;}
+\def\FSpplbo{pplbo=\\10:pplbo8t;;}
 
 \def\FSzplmi{zplmi=\Fskew127\\10:zplmi;;}
 \def\FSzplbmi{zplbmi=\Fskew127\\10:zplbmi;;}
@@ -36,24 +38,21 @@
 
 \def\FSfvsr{fvsr=\Fscale17/20\\10:fvsr8t;;}
 
-\def\Ffamseta{\FSzplrtlf\FSzplrtlf\FSzplrtlf}
-\def\Ffamsetb{\FSzplmi\FSzplmi\FSzplmi}
+\def\Ffamseta{\FSzplrtlf\FSzplrtlf\FSzplrtlf} \let\rmset=\FSzplrtlf 
+\def\Ffamsetb{\FSzplmi\FSzplmi\FSzplmi}       \let\miset=\FSzplmi
 \def\Ffamsetc{\FSzplsy\FSzplsy\FSzplsy}
 \def\Ffamsetd{\FSzplexx\FSzplexx\FSzplexx}
-\def\Ffamsete{\FSzplitlf\FSnull\FSnull}
-\def\Ffamsetf{\FSzplitlf\FSnull\FSnull}
-\def\Ffamsetg{\FSzplbtlf\FSzplbtlf\FSzplbtlf}
-\def\Ffamseth{\FSxtt\FSnull\FSnull}
-\def\Ffamseti{\FSzplrtlfscl\FSnull\FSnull}
-\def\Ffamsetj{\FSfvsr\FSfvsr\FSfvsr}
-\def\FfamsetA{\FSmsbm\FSmsbm\FSmsbm}
+\def\Ffamsete{\FSzplitlf\FSnull\FSnull}       \let\itset=\FSzplitlf
+\def\Ffamsetf{\FSpplro\FSnull\FSnull}         \let\slset=\FSpplro
+\def\Ffamsetg{\FSzplbtlf\FSzplbtlf\FSzplbtlf} \let\bfset=\FSzplbtlf
+\def\Ffamseth{\FSxtt\FSnull\FSnull}           \let\ttset=\FSxtt
+\def\Ffamseti{\FSzplrtlfscl\FSnull\FSnull}    \let\scset=\FSzplrtlfscl
+\def\Ffamsetj{\FSfvsr\FSfvsr\FSfvsr}          \let\ssset=\FSfvsr
+\def\FfamsetA{\FSzplsym\FSzplsym\FSzplsym}
 \def\FfamsetB{\FSrsfso\FSrsfso\FSrsfso}
-\def\FfamsetC{\FSeusm\FSeusm\FSeusm}
-\def\FfamsetD{\FSeufm\FSeufm\FSeufm}
-\def\FfamsetE{\FScmmib\FScmmib\FScmmib}
+\def\FfamsetC{\FSeusm\FSeusm\FSeusm}% TODO
+\def\FfamsetD{\FSeufm\FSeufm\FSeufm}% TODO
+\def\FfamsetE{\FSzplbmi\FSzplbmi\FSzplbmi}
 \def\FfamsetF{\FSnull\FSnull\FSnull}
 
-\let\rmset=\FSzplrtlf    \let\miset=\FSzplmi
-\let\itset=\FSzplitlf    \let\slset=\FSzplitlf
-\let\bfset=\FSzplbtlf    \let\ttset=\FSxtt
-\let\scset=\FSzplrtlfscl \let\ssset=\FSfvsr
+\endinput
