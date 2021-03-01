@@ -20,6 +20,9 @@
 % TODO: consider footline/headline during font changes
 % TODO: don't set parskip and parindent
 % TODO: automatic section/proclaim numbering
+% TODO: \> for medmuskip is unfortunate. Use \< \> for angle brackets instead.
+% TODO: rework problem macros (again), and allow for prob statements to break
+%   across pages with high penalty.
 
 \csname input:defs.tex\endcsname
 \expandafter\let\csname input:defs.tex\endcsname=\endinput
@@ -650,7 +653,7 @@
 \def\cyellow{\setcolorrgb {1}{1}{0}}
 
 % Arbitrary HTML-style hex colors.
-\def\chex:#1#2#3#4#5#6{%
+\def\chex"#1#2#3#4#5#6{%
 	\begingroup
 	\@hextodec\R#1#2#1#2%
 	\@hextodec\G#3#4#3#4%
@@ -659,7 +662,7 @@
 	\@\ignorespaces}
 
 % 16 shades of grey.
-\def\cgrey:#1{%
+\def\cgrey"#1{%
 	\begingroup
 	\@hextodec\grey#1#1#1#1%
 	\edef\@{\endgroup\noexpand\setcolorgrey{\grey}}%
