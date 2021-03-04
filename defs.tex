@@ -322,13 +322,16 @@
 \def\@blist{$\bullet$\enspace}
 \def\@nlist{{\rm\the\icnt.}\enspace}
 \def\@clist{{\rm\char\icnt.}\enspace}
-\def\blist{\let\ifmt=\@blist \icnt=0  \advance\ilvl1}
-\def\nlist{\let\ifmt=\@nlist \icnt=0  \advance\ilvl1}
-\def\ulist{\let\ifmt=\@clist \icnt=64 \advance\ilvl1}
-\def\llist{\let\ifmt=\@clist \icnt=96 \advance\ilvl1}
-\def\item{\par \advance\icnt1 \global\hangafter=0
+\def\blist{\let\ifmt=\@blist \icnt=0  \list}
+\def\nlist{\let\ifmt=\@nlist \icnt=0  \list}
+\def\ulist{\let\ifmt=\@clist \icnt=64 \list}
+\def\llist{\let\ifmt=\@clist \icnt=96 \list}
+\def\list{\advance\ilvl1 \aftergroup\par}
+\def\item{\advance\icnt1 \@item \noindent\llap{\ifmt}}
+\def\cont{\@item \noindent}
+\def\@item{\par \global\hangafter=0
 	\global\hangindent=\iind \global\multiply\hangindent\ilvl
-	\global\advance\hangindent\ioff \noindent\llap{\ifmt}\ignorespaces}
+	\global\advance\hangindent\ioff}
 \let\itemitem=\@undefined% Undefine macro from plain tex.
 
 % Like Plain TeX narrower, but advance left/rightskip by specified ammount
