@@ -22,6 +22,8 @@
 % TODO: automatic section/proclaim numbering
 % TODO: rework problem macros (again), and allow for prob statements to break
 %   across pages with high penalty.
+% TODO: macros for repeating entries/tabs in alignments (see ENGR240 work plan)
+% TODO: fix \interject by using that primitve that tells you last paragraph width
 
 \csname input:defs.tex\endcsname
 \expandafter\let\csname input:defs.tex\endcsname=\endinput
@@ -48,14 +50,14 @@
 \newcount\@form
 \def\@foru{\ifnum\@fori<\@form \@forbody\advance\@fori 1 \ea\@foru \fi}
 \def\@ford{\ifnum\@fori>\@form \@forbody\advance\@fori-1 \ea\@ford \fi}
-\def\for#1=#2..#3\do#4{{%
+\long\def\for#1=#2..#3\do#4{{%
 	\let#1=\@fori \@fori=#2\relax \futurelet\@foreq\@form#3\relax
 	\def\@forbody{#4}%
 	\ifnum\@fori<\@form\@foru\else\@ford\fi
 	\if\@foreq=\@forbody\fi}}
 
 \def\@foragain{\ifx\@next\relax \else \ea\@iter \fi}
-\def\foreach#1=#2\do#3{{%
+\long\def\foreach#1=#2\do#3{{%
 	\def\@iter##1,{\def#1{##1}#3\futurelet\@next\@foragain}%
 	\@iter#2,\relax}}
 
