@@ -4,8 +4,6 @@
 %  copy it eveywhere) and, on success, creates a file in the CWD with the
 %  git commit hash of the version of defs.tex that was compatible
 
-% TODO: genericize \verb macro by making begining and end of line tokens
-%   arbitrary (see CSC349A A1)
 % TODO: insertion macros that use \@vskip macros
 % TODO: lorem should not start new paragraph?
 % TODO: \page macro?
@@ -24,6 +22,9 @@
 %   across pages with high penalty.
 % TODO: macros for repeating entries/tabs in alignments (see ENGR240 work plan)
 % TODO: fix \interject by using that primitve that tells you last paragraph width
+% TODO: lists with ifmt of form (a), where the letter is placed in a box the
+% maximum width of letters upto "l" (beyond that, "m" is too wide and the
+% earlier ones look bad)
 
 \csname input:defs.tex\endcsname
 \expandafter\let\csname input:defs.tex\endcsname=\endinput
@@ -114,7 +115,6 @@
 \parskip=\smallskipamount
 
 \newskip\hugeskipamount \hugeskipamount=24pt plus8pt minus8pt
-\newcount\verbpenalty   \verbpenalty=0
 \newdimen\prob@sidesize \prob@sidesize=20pt
 \newdimen\prob@rulegap  \prob@rulegap=5pt
 \newskip\prob@topskip   \prob@topskip=16pt plus6pt minus6pt
@@ -597,32 +597,35 @@
 %%% VERBATIM %%%
 
 % Usage:
-%   \iverb <arbitrary local initialization> \verb<<an arbitrary delimiter
+%   \Verb[local init]<<an arbitrary delimiter
 %   {this} %is
 %		$all$ ~verbatim--
 %   an arbitrary delimiter
 %   Back to non-verbatim.
-% \verbpenalty is inserted between lines.
-\def\iverb{\begingroup}
-\def\verb@term{\errmessage{verb delimiter should be on new line}}
-\def\verb@eol{%
-	\ifx\verb@next\verb@term% End of verbatim?
-		\let\verb@term=\relax% Silence error message.
-	\else
-		\penalty\verbpenalty
-	\fi}
-{\obeylines\gdef\verb{%
-	\def\@verb<<##1^^M{% Scan delimiter like Unix here doc.
-		\long\def\@@verb####1##1{####1\verb@term\endgroup}%
-		\@@verb}%
+\newtoks\Vbol \Vbol={}
+\newtoks\Vibl \Vibl={\leavevmode\endgraf}
+\newtoks\Vend \Vend={}
+\def\@Vterm{\errmessage{Verb delimiter should be on new line}}
+\def\@Vproc{%
+	\ifx\@Vnext\@Vterm% End of verbatim?
+		\let\@Vterm=\relax% Silence error message.
+		\the\Vend
+	\else \@Vibl\def\@Vibl{\the\Vibl}\the\Vbol \fi}
+{\obeylines\gdef\Verb#1<<{\begingroup%
+	\def\@Verb##1^^M{% Scan delimiter like Unix here doc.
+		\long\def\@@Verb####1##1{%
+			\futurelet\@Vnext\@Vproc####1\@Vterm\endgroup}%
+		\@@Verb}%
+	\let\@Vibl=\relax%
 	\def\do##1{\catcode`##1=12 }\dospecials% Init specials
-	\def\par{\leavevmode \endgraf \futurelet\verb@next\verb@eol}%
+	\def\par{\futurelet\@Vnext\@Vproc}%
 	\obeylines% Init lines
-	\verb@obeyspaces% Init spaces
-	\@verb}}
+	\@Vobeyspaces% Init spaces
+	#1% User post-init
+	\@Verb}}
 
 % Like Plain TeX \obeyspaces, but use control spaces, not \space.
-{\obeyspaces\gdef\verb@obeyspaces{\let =\ \obeyspaces}}
+{\obeyspaces\gdef\@Vobeyspaces{\let =\ \obeyspaces}}
 
 % Convert tabs into 4 spaces (for code listings).
 {\catcode`\^^I=13
@@ -630,9 +633,18 @@
 
 % Start code block. Terminate with "EOF" (hence, this is not suitable for code
 % that literally contains "EOF").
-\def\code{\par \@medbreak \iverb \aftergroup\@medskip \aftergroup\noparskip
-	\verbpenalty=1000 \narrowerby20pt \parskip=0pt \expandtabs \tt
-	\verb<<EOF}
+\def\Vcodeinit{
+	\narrowerby20pt \parskip=0pt \expandtabs \tt \Vbol={}%
+	\Vibl={\leavevmode\endgraf\penalty1000}\Vend={\leavevmode\endgraf}}
+\def\Vcode{\par \@medbreak
+	\Verb \aftergroup\@medskip \aftergroup\noparskip \Vcodeinit<<EOF}
+
+% Read file with file name #2 verbatim with pre init #1.
+% The delimiter ^^fc^^fd^^fe^^ff should never appear
+% (those 4 bytes are invalid UTF8).
+{\obeylines\gdef\Vinput#1#2{\Verb#1<<^^fc^^fd^^fe^^ff
+	\input#2
+	^^fc^^fd^^fe^^ff}}
 
 
 %%% PDFTeX %%%
