@@ -6,7 +6,6 @@
 
 % TODO: insertion macros that use \@vskip macros
 % TODO: lorem should not start new paragraph?
-% TODO: \page macro?
 % TODO: general section macros with parametric fonts (plaintex beginsection
 %   sucks): see engr240 memo
 % TODO: more general figure macros (with caption support)?
@@ -25,6 +24,7 @@
 % TODO: lists with ifmt of form (a), where the letter is placed in a box the
 % maximum width of letters upto "l" (beyond that, "m" is too wide and the
 % earlier ones look bad)
+% TODO: \perm(...) macro from MATH 212
 
 \csname input:defs.tex\endcsname
 \expandafter\let\csname input:defs.tex\endcsname=\endinput
@@ -383,6 +383,12 @@
 \def\qed{\unskip\hskip1em plus1fil \hbox{}\nobreak\hfill$\qedbox$\par}
 
 \def\topic#1. {\par{\bf#1.}\enspace}
+
+\newbox\@pagebox
+\def\page{\supereject \begingroup
+	\setbox\@pagebox=\vbox to\vsize\bgroup \boxmaxdepth=\maxdepth}
+\def\endpage{\egroup% End vbox started in \page.
+	\def\pagebody{\unvbox255 \box\@pagebox}\hbox{}\eject\endgroup}
 
 
 %%% MATH %%%
