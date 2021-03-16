@@ -24,7 +24,6 @@
 % TODO: lists with ifmt of form (a), where the letter is placed in a box the
 % maximum width of letters upto "l" (beyond that, "m" is too wide and the
 % earlier ones look bad)
-% TODO: \perm(...) macro from MATH 212
 
 \csname input:defs.tex\endcsname
 \expandafter\let\csname input:defs.tex\endcsname=\endinput
@@ -486,6 +485,10 @@
 		\hrule height#3%
 		\hbox{\vrule width#3height#2\kern#1\vrule width#3}%
 		\hrule height#3}}}
+
+\def\@permend\,\@permiter{}
+\def\@permiter#1,{#1\,\@permiter}
+\def\perm(#1){(\@permiter#1\@permend,)}
 
 % TODO weird
 \def\mvstrut#1{\vcenter{\hrule width0pt height#1}}
