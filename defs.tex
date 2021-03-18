@@ -16,7 +16,7 @@
 %   than new penalty?
 % TODO: consider footline/headline during font changes
 % TODO: don't set parskip and parindent
-% TODO: automatic section/proclaim numbering
+% TODO: automatic section/proclaim numbering (\count1.\count2.\count3)
 % TODO: rework problem macros (again), and allow for prob statements to break
 %   across pages with high penalty.
 % TODO: macros for repeating entries/tabs in alignments (see ENGR240 work plan)
@@ -439,6 +439,8 @@
 \def\@intkern{\mkern-9mu\mathchoice{\mkern-5mu}{}{}{}}
 \def\iint{\int\@intkern\int\nolimits}
 \def\iiint{\int\@intkern\int\@intkern\int\nolimits}
+
+\def\bmatrix#1{\left[\matrix{#1}\right]}
 
 % eqalignno, but you can add an explaination to each line.
 \def\exalignno#1{\displ@y \tabskip=\centering
