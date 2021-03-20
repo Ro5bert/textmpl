@@ -464,6 +464,10 @@
 	\baselineskip=-1000pt \lineskip=.25ex \lineskiplimit=\maxdimen
 	\ialign{\hfil$\ssty##$\hfil\crcr#1\crcr}}}
 
+% \overline{#3}, except #1mu shorter on left and #2mu shorter on right.
+\def\varbar#1#2#3{{\muskip0=#1mu \muskip1=#2mu \mkern\muskip0
+	\overline{\mkern-\muskip0{#3}\mkern-\muskip1}\mkern\muskip1}{}}
+
 % Missing from plain tex.
 \def\imp{\;\Longrightarrow\;}% To match \iff.
 \def\lcm{\mathop{\rm lcm}}% To match \gcd.
