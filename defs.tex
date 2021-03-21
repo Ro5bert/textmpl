@@ -132,10 +132,11 @@
 \newskip\prob@topskip   \prob@topskip=16pt plus6pt minus6pt
 
 % Registers for temporary use.
-\newcount\@count \newcount\@@count
-\newskip\@skip   \newskip\@@skip
-\newdimen\@dimen \newdimen\@@dimen
-\newbox\@box     \newbox\@@box
+\newcount\@count   \newcount\@@count
+\newskip\@skip     \newskip\@@skip
+\newmuskip\@muskip \newmuskip\@@muskip
+\newdimen\@dimen   \newdimen\@@dimen
+\newbox\@box       \newbox\@@box
 
 
 %%% FONTS %%%
@@ -472,8 +473,8 @@
 	\ialign{\hfil$\ssty##$\hfil\crcr#1\crcr}}}
 
 % \overline{#3}, except #1mu shorter on left and #2mu shorter on right.
-\def\varbar#1#2#3{{\muskip0=#1mu \muskip1=#2mu \mkern\muskip0
-	\overline{\mkern-\muskip0{#3}\mkern-\muskip1}\mkern\muskip1}{}}
+\def\varbar#1#2#3{{\@muskip=#1mu \@@muskip=#2mu \mkern\@muskip
+	\overline{\mkern-\@muskip{#3}\mkern-\@@muskip}\mkern\@@muskip}{}}
 
 % Missing from plain tex.
 \def\imp{\;\Longrightarrow\;}% To match \iff.
