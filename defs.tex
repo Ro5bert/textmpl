@@ -442,6 +442,13 @@
 
 \def\bmatrix#1{\left[\matrix{#1}\right]}
 
+% Upgraded \eqalign that works for multiple aligned columns.
+% Redefine \eqalignskip to change column spacing.
+\def\@malign{\hfil\strut$\dsty{##}$\tabskip=0pt&$\dsty{{}##}$\hfil}
+\def\eqalignskip{\qquad}
+\def\eqalign#1{\null\,\vcenter{\openup1\jot \m@th
+	\ialign{\span\@malign&&\eqalignskip\span\@malign\crcr #1\crcr}}\,}
+
 % eqalignno, but you can add an explaination to each line.
 \def\exalignno#1{\displ@y \tabskip=\centering
 	\halign to\displaywidth{%
