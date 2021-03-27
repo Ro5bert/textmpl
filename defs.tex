@@ -432,6 +432,10 @@
 \let\<=\langle
 \let\>=\rangle% Note this overrides \> = medmuskip.
 
+% \left and \right but the resulting atoms are open/close, not inner.
+\def\ml{\mathopen{}\mathclose\bgroup\left}
+\def\mr{\aftergroup\egroup\right}
+
 % https://www.tug.org/TUGboat/tb22-4/tb72perlS.pdf
 \def\mllap{\mathpalette\@mllap}
 \def\mrlap{\mathpalette\@mrlap}
@@ -486,6 +490,9 @@
 \def\imp{\;\Longrightarrow\;}% To match \iff.
 \def\lcm{\mathop{\rm lcm}}% To match \gcd.
 
+\def\mop#1(#2){\mathop{\rm{#1}}\ml({#2}\mr)}
+\def\GF{\mathop{\rm GF}}
+\mathchardef\nmid="3A2D
 \def\rank{\mathop{\rm rank}}
 \def\mod#1{\ ({\rm mod}\,\,#1)}% \pmod not good for in-line math.
 \def\notprec{\mathrel{\mathpalette\c@ncel\prec}}
