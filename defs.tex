@@ -315,19 +315,19 @@
 
 % Change parskip until after the next paragraph.
 \newskip\tps@oldparskip
-\def\tmpparskip#1{%
+\def\tmpparskip{%
 	\ifx\tps@oldpar\@undefined
 		\global\let\tps@oldpar=\par
 		\global\tps@oldparskip=\parskip
-		\gdef\@restoreparskip{%
+		\gdef\tps@restore{%
 			\global\parskip=\tps@oldparskip
 			\global\let\par=\tps@oldpar
 			\global\let\tps@oldpar=\@undefined}
-		\gdef\par{\ifhmode \@restoreparskip\par \fi}%
+		\gdef\par{\ifhmode \tps@restore\par \fi}%
 	\fi
-	\global\parskip=#1}
-\let\@restoreparskip=\relax
-\def\noparskip{\tmpparskip{0pt}}
+	\global\parskip=}
+\let\tps@restore=\relax
+\def\noparskip{\tmpparskip0pt }
 \def\yesparskip{\@restoreparskip}
 
 
