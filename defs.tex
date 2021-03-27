@@ -24,6 +24,11 @@
 % TODO: lists with ifmt of form (a), where the letter is placed in a box the
 % maximum width of letters upto "l" (beyond that, "m" is too wide and the
 % earlier ones look bad)
+% TODO: pdftex transformations (scale, rotate, etc.)
+% TODO: make item update icnt AFTER using it for current item, so that an
+% update to icnt right before the item doesn't need to be one less
+% TODO: update input guards to be very first in every file (catcode change
+% before is broken)
 
 \csname input:defs.tex\endcsname
 \expandafter\let\csname input:defs.tex\endcsname=\endinput
@@ -68,6 +73,7 @@
 % Strip "pt" off the end of \the\dimenX. Argument must be fully expanded.
 {\catcode`\p=12 \catcode`\t=12 \gdef\@#1pt{#1}}
 \let\@strippt=\@ \let\@=\@undefined
+\def\@dimnum#1{\ea\@strippt\the#1}
 
 % Convert 4 digit hex number #2#3#4#5 to decimal in range [0,1) and store
 % it in #1.
