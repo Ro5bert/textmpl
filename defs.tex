@@ -48,23 +48,55 @@
 
 \def\gobble#1{}
 \def\gobbleto#1{\begingroup\def\@gobble##1#1{\endgroup}\@gobble}
+% TODO: these are weird: remove them
 \def\1#1#2{#1} % I.e., firstoftwo
 \def\2#1#2{#2} % I.e., secondoftwo
 
-\newcount\@fori
-\newcount\@form
-\def\@foru{\ifnum\@fori<\@form \@forbody\advance\@fori 1 \ea\@foru \fi}
-\def\@ford{\ifnum\@fori>\@form \@forbody\advance\@fori-1 \ea\@ford \fi}
-\long\def\for#1=#2..#3\do#4{{%
-	\let#1=\@fori \@fori=#2\relax \futurelet\@foreq\@form#3\relax
-	\def\@forbody{#4}%
-	\ifnum\@fori<\@form\@foru\else\@ford\fi
-	\if\@foreq=\@forbody\fi}}
+\def\@END{\errmessage{this should not execute!}}
+\def\@@END{\@END}
 
-\def\@foragain{\ifx\@next\relax \else \ea\@iter \fi}
-\long\def\foreach#1=#2\do#3{{%
-	\def\@iter##1,{\def#1{##1}#3\futurelet\@next\@foragain}%
-	\@iter#2,\relax}}
+% General, low-level iteration macros.
+% See \for, \forlet, and \fordef for example usage.
+\newif\ifiterbreak
+\let\iterbreak=\iterbreaktrue
+\def\iterate{\iterbreakfalse \iterscan}
+\def\iterproc{\iterbody \ifiterbreak
+	\def\@iternext{\@iterrst \gobbleto\iterend}\else
+	\let\@iternext=\iterscan \fi \@iternext}
+\def\@iterrst{\let\iterbody=\@undefined \let\iterscan=\iterproc}
+\@iterrst
+
+\long\def\loop#1\repeat{\def\iterbody{#1\else \iterbreak \fi}\iterate\iterend}
+\let\repeat=\fi
+
+\newcount\@form
+\newcount\@foria \newcount\@forib \newcount\@foric \newcount\@forid
+\newcount\@forie \newcount\@forif \newcount\@forig \newcount\@forih
+\def\@foriselect{\@foriset
+	\@foria\@forib\@foric\@forid\@forie\@forif\@forig\@forih;;}
+\def\@foriset#1#2;{\ifx#1;\errmessage{for loop nesting too deep}\else
+	\let\@fori=#1\def\@foriselect{\@foriset#2;;}\ea\gobble\fi}
+\def\@foru{\ifnum\@fori<\@form \@forbody\advance\@fori 1 \else \iterbreak \fi}
+\def\@ford{\ifnum\@fori>\@form \@forbody\advance\@fori-1 \else \iterbreak \fi}
+\long\def\for#1=#2..#3\do#4{{%
+	\@foriselect \let#1=\@fori \@fori=#2\relax
+	\futurelet\@foreq\@form#3\relax \def\@forbody{#4}%
+	\ifnum\@fori<\@form \let\iterbody=\@foru \else \let\iterbody=\@ford \fi
+	\iterate\iterend \if\@foreq=\@forbody\fi}}
+
+\def\@forletib{\ifx\@next\@END \iterbreak \else \@forbody \fi}
+\def\@forletis{\afterassignment\iterproc \let\@next=}
+\long\def\forlet#1=#2\do#3{{%
+	\def\@forbody{\let#1=\@next #3}%
+	\let\iterbody=\@forletib \let\iterscan=\@forletis
+	\iterate#2\@END\iterend}}
+
+\def\@fordefib{\ifx\@next\@@END \iterbreak \else \@forbody \fi}
+\def\@fordefis#1{\def\@next{#1}\iterproc}
+\long\def\fordef#1=#2\do#3{{%
+	\def\@forbody{\let#1=\@next #3}%
+	\let\iterbody=\@fordefib \let\iterscan=\@fordefis
+	\iterate#2\@END\iterend}}
 
 % Zero pad a positive integer. E.g., \zeropad{000}{13} => 013.
 % Idea from https://tex.stackexchange.com/a/412225/202281.
