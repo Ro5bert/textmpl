@@ -116,15 +116,11 @@
 % Get the maximum/minimum width of the material produced by each macro
 % argument among #2 and assign it to #1.
 % E.g., \maxwd\dimen0={abc} assigns the max width of a,b,c to \dimen0.
-\newif\if@mwdstop
-\def\@maxwd#1{\setbox\@box=\hbox{#1}\if@mwdstop \else
-	\ifdim\wd\@box>\@dimen \@dimen=\wd\@box \fi \ea\@maxwd \fi}
-\def\maxwd#1=#2{\@dimen=-\maxdimen \@mwdstopfalse
-	\@maxwd#2{\global\@mwdstoptrue}#1=\@dimen}
-\def\@minwd#1{\setbox\@box=\hbox{#1}\if@mwdstop \else
-	\ifdim\wd\@box<\@dimen \@dimen=\wd\@box \fi \ea\@minwd \fi}
-\def\minwd#1=#2{\@dimen=\maxdimen \@mwdstopfalse
-	\@minwd#2{\global\@mwdstoptrue}#1=\@dimen}
+\newdimen\@mwdtmp
+\def\@mwd#1#2#3{\fordef\@=#3\do{\setbox\@box=\hbox{\@}%
+	\ifdim\wd\@box#2\@mwdtmp \global\@mwdtmp=\wd\@box \fi}#1=\@mwdtmp}
+\def\maxwd#1={\@mwdtmp=-\maxdimen \@mwd{#1}>}
+\def\minwd#1={\@mwdtmp=\maxdimen \@mwd{#1}<}
 
 % defer and edefer are for defering execution of the given tokens until after
 % the current group. edefer is the same as defer, except edefer expands the
