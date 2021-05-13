@@ -29,6 +29,9 @@
 % update to icnt right before the item doesn't need to be one less
 % TODO: update input guards to be very first in every file (catcode change
 % before is broken)
+% TODO: \adef for active define, like in OpTeX
+% TODO: inline verb macro that works kinda like read file verb macro in that
+% it makes the delimiter some characters we'll never use
 
 \csname input:defs.tex\endcsname
 \expandafter\let\csname input:defs.tex\endcsname=\endinput
@@ -520,6 +523,8 @@
 
 \def\mop#1(#2){\mathop{\rm{#1}}\ml({#2}\mr)}
 \def\GF{\mathop{\rm GF}}
+\def\Span{\mathop{\rm span}}
+\def\sgn{\mathop{\rm sgn}}
 \mathchardef\nmid="3A2D
 \def\rank{\mathop{\rm rank}}
 \def\mod#1{\ ({\rm mod}\,\,#1)}% \pmod not good for in-line math.
