@@ -207,6 +207,7 @@
 \def\newfam{\errmessage{Don't use \noexpand\newfam with defs.tex!}}
 
 \newdimen\Fsize \newdimen\Ftsize \newdimen\Fssize \newdimen\Fsssize
+\newdimen\Fbight \newdimen\FBight \newdimen\Fbigght \newdimen\FBigght
 \newcount\@Fskewchar \newcount\@Fhyphenchar
 \newcount\@Fscalenum \newcount\@Fscaleden
 
@@ -257,6 +258,7 @@
 	\@Fupdfam"A\FfamsetA \@Fupdfam"B\FfamsetB
 	\@Fupdfam"C\FfamsetC \@Fupdfam"D\FfamsetD
 	\@Fupdfam"E\FfamsetE \@Fupdfam"F\FfamsetF}
+% TODO: Fdefsty to make adding to this easier?
 \def\Fupdfonts{\@dimen=\Fsize
 	\Ffind\rmset \let\rmfont=\Ffont
 	\Ffind\miset \let\mifont=\Ffont
@@ -268,12 +270,19 @@
 	\Ffind\ssset \let\ssfont=\Ffont}
 \def\Fupdstrut{\setbox\strutbox=\hbox{\vrule height.7\normalbaselineskip
 	depth.3\normalbaselineskip width0pt}}
+\def\@Fupddelim#1#2{\setbox\@box=\vbox{\hbox{$#2$}\kern0pt}%
+	#1\ht\@box \divide#12 \advance#1\fontdimen22\textfont2 }
+\def\Fupddelims{%
+	\@Fupddelim\Fbight\Fbigchar
+	\@Fupddelim\FBight\FBigchar
+	\@Fupddelim\Fbigght\Fbiggchar
+	\@Fupddelim\FBigght\FBiggchar}
 
 % \Fmch and \Fch are for changing font sizes. Note that these only change font
 % sizes, the \normalbaselineskip, and the \strutbox. To make the change look
 % good, other document changes are probably necessary (e.g., the display
 % skips).
-\def\@Fmch{\Fupdfams \Fupdfonts \Fupdstrut
+\def\@Fmch{\Fupdfams \Fupdfonts \Fupdstrut \Fupddelims
 	\normalbaselines\rm}
 \def\Fmch#1/#2/#3/#4/{%
 	\Fsize=#1\relax \Ftsize=#2\relax \Fssize=#3\relax \Fsssize=#4\relax
@@ -467,6 +476,11 @@
 % \left and \right but the resulting atoms are open/close, not inner.
 \def\ml{\mathopen{}\mathclose\bgroup\left}
 \def\mr{\aftergroup\egroup\right}
+
+\def\big#1{{\hbox{$\left#1\vbox to\Fbight{}\right.\n@space$}}}
+\def\Big#1{{\hbox{$\left#1\vbox to\FBight{}\right.\n@space$}}}
+\def\bigg#1{{\hbox{$\left#1\vbox to\Fbigght{}\right.\n@space$}}}
+\def\Bigg#1{{\hbox{$\left#1\vbox to\FBigght{}\right.\n@space$}}}
 
 % https://www.tug.org/TUGboat/tb22-4/tb72perlS.pdf
 \def\mllap{\mathpalette\@mllap}
