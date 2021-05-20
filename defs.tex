@@ -266,14 +266,14 @@
 	\Ffind\ttset \let\ttfont=\Ffont
 	\Ffind\scset \let\scfont=\Ffont
 	\Ffind\ssset \let\ssfont=\Ffont}
+\def\Fupdstrut{\setbox\strutbox=\hbox{\vrule height.7\normalbaselineskip
+	depth.3\normalbaselineskip width0pt}}
 
-% \Fmch and \Fch are for chaning font sizes. Note that these only change font
+% \Fmch and \Fch are for changing font sizes. Note that these only change font
 % sizes, the \normalbaselineskip, and the \strutbox. To make the change look
 % good, other document changes are probably necessary (e.g., the display
 % skips).
-\def\@Fmch{\Fupdfams \Fupdfonts
-	\setbox\strutbox=\hbox{%
-		\vrule height.7\normalbaselineskip depth.3\normalbaselineskip width0pt}
+\def\@Fmch{\Fupdfams \Fupdfonts \Fupdstrut
 	\normalbaselines\rm}
 \def\Fmch#1/#2/#3/#4/{%
 	\Fsize=#1\relax \Ftsize=#2\relax \Fssize=#3\relax \Fsssize=#4\relax
