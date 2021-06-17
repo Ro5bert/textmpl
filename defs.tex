@@ -60,6 +60,7 @@
 
 % General, low-level iteration macros.
 % See \for, \forlet, and \fordef for example usage.
+% TODO add way to check if on last iteration
 \newif\ifiterbreak
 \let\iterbreak=\iterbreaktrue
 \def\iterate{\iterbreakfalse \iterscan}
@@ -163,7 +164,6 @@
 \parindent=0pt
 \parskip=\smallskipamount
 
-\newskip\hugeskipamount \hugeskipamount=24pt plus8pt minus8pt
 \newdimen\prob@sidesize \prob@sidesize=20pt
 \newdimen\prob@rulegap  \prob@rulegap=5pt
 \newskip\prob@topskip   \prob@topskip=16pt plus6pt minus6pt
@@ -318,42 +318,51 @@
 
 %%% VERTICAL SKIPS %%%
 
+\newskip\hugeskipamount \hugeskipamount=24pt plus8pt minus8pt
 \def\hugeskip{\vskip\hugeskipamount}
 \def\hugebreak{\par \ifdim\lastskip<\hugeskipamount
 	\removelastskip \penalty-400 \hugeskip \fi}
 
-% \revskip replaces the previous glue on the vertical list with the
-% specified glue.
-\def\revskip{\par\removelastskip\vskip}
-\def\resmallskip{\revskip\smallskipamount}
-\def\remedskip{\revskip\medskipamount}
-\def\rebigskip{\revskip\bigskipamount}
-\def\rehugeskip{\revskip\hugeskipamount}
+% Use \@vskip over \vskip when it should be overridable by \xvskip.
+\newif\if@vskip \@vskiptrue
+\def\@vskip{\if@vskip \vskip \else \global\@vskiptrue\@skip \fi}
 
-% \@vskip inserts the specified glue only if \lastskip=0pt (i.e., if the last
-% item on the current vertical list isn't a glue). The intented use is for
-% macros that typically insert glue before some content (e.g., a figure or an
-% algorithm), so that the user can override the glue before the content simply
-% by specifying an explicit skip before using the macro. Also, the penalty in
-% register \@penalty is inserted before the glue if \@penalty isn't 0,
-% and \@penalty is zeroed.
-\newcount\@penalty \@penalty=0
-\def\@vskip{%
-	\par\begingroup
-	\def\@{\ifdim\lastskip=0pt
-		\ifnum\@penalty=0 \else \penalty\@penalty \fi
-		\vskip\@skip \fi \global\@penalty=0 \endgroup}%
-	\afterassignment\@\@skip=}
-\def\@smallskip{\@vskip\smallskipamount}
-\def\@medskip{\@vskip\medskipamount}
-\def\@bigskip{\@vskip\bigskipamount}
-\def\@hugeskip{\@vskip\hugeskipamount}
-\def\@smallbreak{\@penalty-50 \@smallskip}
-\def\@medbreak{\@penalty-100 \@medskip}
-\def\@bigbreak{\@penalty-200 \@bigskip}
-\def\@hugebreak{\@penalty-400 \@hugeskip}
+% \mvskip replaces the previous vskip if and only if the new skip size is
+% larger than the old skip size. \mvskip uses \@vskip, thereby respecting
+% \xvskip.
+\newcount\@mpenalty \newif\if@mpenalty
+\def\mpenalty{\global\@mpenaltytrue\@mpenalty=}
+\def\@mvskip{\par \if@vskip \ifdim\lastskip<\@skip \removelastskip
+	\if@mpenalty \penalty\@mpenalty \fi \@vskip\@skip \fi
+	\else \global\@vskiptrue \fi \global\@mpenaltyfalse}
+\def\mvskip{\afterassignment\@mvskip\@skip=}
+\def\msmallskip{\mvskip\smallskipamount}
+\def\mmedskip{\mvskip\medskipamount}
+\def\mbigskip{\mvskip\bigskipamount}
+\def\mhugeskip{\mvskip\hugeskipamount}
+\def\msmallbreak{\mpenalty-50 \msmallskip}
+\def\mmedbreak{\mpenalty-100 \mmedskip}
+\def\mbigbreak{\mpenalty-200 \mbigskip}
+\def\mhugebreak{\mpenalty-400 \mhugeskip}
+
+% \xvskip replaces the previous vskip and supresses the next \@vskip.
+\newcount\@xpenalty \newif\if@xpenalty
+\def\xpenalty{\global\@xpenaltytrue\@xpenalty=}
+\def\@xvskip{\par \removelastskip
+	\if@xpenalty \penalty\@xpenalty \global\@xpenaltyfalse \fi
+	\vskip\@skip \global\@vskipfalse}
+\def\xvskip{\afterassignment\@xvskip\@skip=}
+\def\xsmallskip{\xvskip\smallskipamount}
+\def\xmedskip{\xvskip\medskipamount}
+\def\xbigskip{\xvskip\bigskipamount}
+\def\xhugeskip{\xvskip\hugeskipamount}
+\def\xsmallbreak{\xpenalty-50 \xsmallskip}
+\def\xmedbreak{\xpenalty-100 \xmedskip}
+\def\xbigbreak{\xpenalty-200 \xbigskip}
+\def\xhugebreak{\xpenalty-400 \xhugeskip}
 
 % Change parskip until after the next paragraph.
+% TODO: this is pretty ugly; could be improved
 \newskip\tps@oldparskip
 \def\tmpparskip{%
 	\ifx\tps@oldpar\@undefined
@@ -362,7 +371,7 @@
 		\gdef\tps@restore{%
 			\global\parskip=\tps@oldparskip
 			\global\let\par=\tps@oldpar
-			\global\let\tps@oldpar=\@undefined}
+			\global\let\tps@oldpar=\@undefined}%
 		\gdef\par{\ifhmode \tps@restore\par \fi}%
 	\fi
 	\global\parskip=}
@@ -373,26 +382,41 @@
 
 %%% TEXT %%%
 
-% Lists. Indent by iind*ilvl + ioff, where ilvl is incremented per nest level.
-% Derive bullet from ifmt based on icnt, which is incremented per item.
-\newcount\icnt
-\newcount\ilvl \ilvl=0
-\newdimen\iind \iind=20pt
-\newdimen\ioff \ioff=0pt
-\let\ifmt=\@undefined
-\def\@blist{$\bullet$\enspace}
-\def\@nlist{{\rm\the\icnt.}\enspace}
-\def\@clist{{\rm\char\icnt.}\enspace}
-\def\blist{\let\ifmt=\@blist \icnt=0  \list}
-\def\nlist{\let\ifmt=\@nlist \icnt=0  \list}
-\def\ulist{\let\ifmt=\@clist \icnt=64 \list}
-\def\llist{\let\ifmt=\@clist \icnt=96 \list}
-\def\list{\advance\ilvl1 \aftergroup\par}
-\def\item{\advance\icnt1 \@item \noindent\llap{\ifmt}}
+% Lists. Indent by Llvl*Lind + Loff, where Llvl is incremented per nest level.
+% Derive bullet from Lfmt based on Lcnt, which is incremented per item.
+\newcount\Lcnt
+\newcount\Llvl \Llvl=0
+\newdimen\Lind \Lind=20pt
+\newdimen\Loff \Loff=0pt
+\newskip\Ltop \Ltop=\smallskipamount
+\newskip\Lgap \Lgap=\smallskipamount
+\newskip\Lbot \Lbot=\smallskipamount
+\newdimen\L@pwd
+\newif\ifL@first
+\def\Ln{{\rm\number\Lcnt}}
+\def\Lr{{\rm\romannumeral\Lcnt}}
+\def\LR{{\rm\uppercase\ea{\romannumeral\Lcnt}}}
+\def\La{{\rm\char\Lcnt}}
+\def\LA{{\rm\char\Lcnt}}
+\def\Lb{$\m@th\bullet$}
+\def\nlist{\list{\Ln.}} % 1. 2. 3. ...
+\def\rlist{\plist{\Lr}} % (i) (ii) (iii) ...
+\def\Rlist{\list{\LR.}} % I. II. III. ...
+\def\alist#1{\plist{\La}{#1}\Lcnt=96 } % (a) (b) (c) ...
+\def\Alist{\list{\LA.}\Lcnt=64 } % A. B. C. ...
+\def\blist{\list{\Lb}} % . . . ...
+\def\plist#1#2{\Llist
+	\def\@pchars{#2}\ifx\@pchars\empty\def\Lfmt{(#1)\enspace}\else
+	\maxwd\L@pwd={#2}\def\Lfmt{\rm(\hbox to\L@pwd{\hss#1\/\hss})\enspace}\fi}
+\def\list#1{\Llist\def\Lfmt{#1\enspace}}
+\def\Llist{\par \begingroup \Lcnt=0 \advance\Llvl1 \let\Lfmt=\empty
+	\L@firsttrue \mvskip\Ltop \noparskip}
+\def\endlist{\par \endgroup \mvskip\Lbot \noparskip}
+\def\item{\advance\Lcnt1 \@item \noindent\llap{\Lfmt}}
 \def\cont{\@item \noindent}
-\def\@item{\par \global\hangafter=0
-	\global\hangindent=\iind \global\multiply\hangindent\ilvl
-	\global\advance\hangindent\ioff}
+\def\@item{\par \ifL@first \L@firstfalse \else \mvskip\Lgap \noparskip \fi
+	\hangafter=0 \hangindent=\Lind
+	\multiply\hangindent\Llvl \advance\hangindent\Loff}
 \let\itemitem=\@undefined% Undefine macro from plain tex.
 
 % Like Plain TeX narrower, but advance left/rightskip by specified ammount
@@ -427,23 +451,33 @@
 	\advance \rightskip by 0pt plus 3em
 	\spaceskip=0.3333em \xspaceskip=0.5em\relax}
 
+% Units are chunks of vertical material separated by vertical space.
+% The first thing in a unit is a paragraph of form "Title.\enspace Text...".
+\newskip\@unitskip
+\def\smallunit{\unit\smallskipamount}
+\def\medunit{\unit\medskipamount}
+\def\bigunit{\unit\bigskipamount}
+\def\hugeunit{\unit\hugeskipamount}
+\def\unit#1#2. {\par \begingroup \@unitskip=#1\mvskip\@unitskip \noparskip
+	\noindent{#2.\enspace}}
+\def\endunit{\mvskip\@unitskip \noparskip \endgroup}
+
+% TODO: this is obsolete
+\def\topic#1. {\par\noindent{\bf#1.}\enspace}
+
 % Theorems+proof, lemmas+proof, definitions, etc.
-% Plain TeX proclaim has been modified to use \@penalty \@vskip constructions
-% and suppress parskip.
-\def\proclaim #1. #2\par{%
-	\par \@medbreak \noparskip
-	\noindent{\bf#1.\enspace}{\sl#2\par}%
-	\@penalty55 \@medskip \noparskip}
+% Plain TeX proclaim has been modified to use medunit.
+\def\proclaim #1. #2\par{\par
+	\mpenalty-100 \medunit{\def\(##1){{\rm(##1)}}\bf#1}.
+	\sl#2\mpenalty55 \endunit}
 \def\Proclaim #1. #2\par{\proclaim{#1}. \rm#2\par}
-\def\proof{% use \proof ... \qed
-	\par \@medskip \noparskip
-	\begingroup \let\@qed=\qed \def\qed{\@qed\@medskip\noparskip\endgroup}%
-	\noindent{\it Proof.\enspace}}
+\def\proof{\medunit\it Proof. }
+\def\endproof{\qed\endunit}
 \def\qedbox{\rect{0.6em}{0.6em}{0.5pt}}
-\def\qed{\unskip\hskip1em plus1fil \hbox{}\nobreak\hfill$\qedbox$\par}
+\def\qed{\leavevmode\unskip\hskip1em plus1fil
+	\hbox{}\nobreak\hfill$\qedbox$\par}
 
-\def\topic#1. {\par{\bf#1.}\enspace}
-
+% TODO: these are slightly broken: glue at top of page kept
 \newbox\@pagebox
 \def\page{\supereject \begingroup
 	\setbox\@pagebox=\vbox to\vsize\bgroup \boxmaxdepth=\maxdepth}
