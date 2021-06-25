@@ -41,12 +41,12 @@
 	\setbox0=\hbox{$\ssty\pclinenofmt$\kern\pclinenogap}%
 	\parindent=\wd0
 	\pc@penalty=0 \pc@lineno=0 \setbox\pc@comment=\box\voidb@x
-	\@penalty\pctopbotpenalty \@vskip\pctopbotskip
+	\mpenalty\pctopbotpenalty \mvskip\pctopbotskip
 	\pc@dorule\kern2pt }
 
 \def\endpcode{%
 	\kern2pt \pc@dorule
-	\@penalty\pctopbotpenalty \@vskip\pctopbotskip
+	\mpenalty\pctopbotpenalty \mvskip\pctopbotskip
 	\endgroup \noparskip}
 
 \def\pc@dorule{%
