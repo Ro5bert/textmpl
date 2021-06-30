@@ -484,6 +484,12 @@
 \def\endpage{\egroup% End vbox started in \page.
 	\def\pagebody{\unvbox255 \box\@pagebox}\hbox{}\eject\endgroup}
 
+\ifx\pdfoutput\@undefined
+	\def\pdfimg{\errmessage{pdfimg requires pdfTeX}}
+\else
+	\def\pdfimg#1file #2.pdf{\pdfximage#1{#2.pdf}\pdfrefximage\pdflastximage}
+\fi
+
 
 %%% MATH %%%
 
@@ -784,48 +790,50 @@
 	^^fc^^fd^^fe^^ff}}
 
 
-%%% PDFTeX %%%
+%%% Color %%%
 
-\ifx\pdfoutput\@undefined \else
+\ifx\pdfoutput\@undefined
+	% dvips
+	\def\@colorpush#1{\special{color push #1}}
+	\def\@colorpop{\special{color pop}}
+	\def\@colorset#1{\@colorpush{#1}\aftergroup\@colorpop}
+	\def\Colorrgb#1#2#3{\@colorset{rgb #1 #2 #3}}
+	\def\Colorgrey#1{\@colorset{gray #1}}
+\else
+	% pdfTeX
+	\mathchardef\@colorstackn=\pdfcolorstackinit page {0 g 0 G}
+	\def\@colorpush#1{\pdfcolorstack\@colorstackn push {#1}}
+	\def\@colorpop{\pdfcolorstack\@colorstackn pop}
+	\def\@colorset#1{\@colorpush{#1}\aftergroup\@colorpop}
+	\def\Colorrgb#1#2#3{\@colorset{#1 #2 #3 rg #1 #2 #3 RG}}
+	\def\Colorgrey#1{\@colorset{#1 g #1 G}}
+\fi
 
-% Insert pdf image.
-\def\pdfimg#1file #2.pdf{\pdfximage#1{#2.pdf}\pdfrefximage\pdflastximage}
+% Basic colors
+\def\Cblack{\Colorgrey{0}}
+\def\Cwhite{\Colorgrey{1}}
+\def\Cred{\Colorrgb    {1}{0}{0}}
+\def\Cgreen{\Colorrgb  {0}{1}{0}}
+\def\Cblue{\Colorrgb   {0}{0}{1}}
+\def\Ccyan{\Colorrgb   {0}{1}{1}}
+\def\Cmagenta{\Colorrgb{1}{0}{1}}
+\def\Cyellow{\Colorrgb {1}{1}{0}}
 
-% Color support.
-\mathchardef\@colorstackn=\pdfcolorstackinit page {0 g 0 G}
-\def\@pdfcolorstackpush#1{\pdfcolorstack\@colorstackn push {#1}}
-\def\@pdfcolorstackpop{\pdfcolorstack\@colorstackn pop}
-\def\@setcolor#1{\@pdfcolorstackpush{#1}\aftergroup\@pdfcolorstackpop}
-\def\setcolorrgb#1#2#3{\@setcolor{#1 #2 #3 rg #1 #2 #3 RG}}
-\def\setcolorgrey#1{\@setcolor{#1 g #1 G}}
-
-% Basic colors.
-\def\cblack{\setcolorgrey{0}}
-\def\cwhite{\setcolorgrey{1}}
-\def\cred{\setcolorrgb    {1}{0}{0}}
-\def\cgreen{\setcolorrgb  {0}{1}{0}}
-\def\cblue{\setcolorrgb   {0}{0}{1}}
-\def\ccyan{\setcolorrgb   {0}{1}{1}}
-\def\cmagenta{\setcolorrgb{1}{0}{1}}
-\def\cyellow{\setcolorrgb {1}{1}{0}}
-
-% Arbitrary HTML-style hex colors.
-\def\chex"#1#2#3#4#5#6{%
+% Arbitrary HTML-style hex colors
+\def\Chex"#1#2#3#4#5#6{%
 	\begingroup
 	\@hextodec\R#1#2#1#2%
 	\@hextodec\G#3#4#3#4%
 	\@hextodec\B#5#6#5#6%
-	\edef\@{\endgroup\noexpand\setcolorrgb{\R}{\G}{\B}}%
+	\edef\@{\endgroup\noexpand\Colorrgb{\R}{\G}{\B}}%
 	\@\ignorespaces}
 
-% 16 shades of grey.
-\def\cgrey"#1{%
+% 16 shades of grey
+\def\Cgrey"#1{%
 	\begingroup
 	\@hextodec\grey#1#1#1#1%
-	\edef\@{\endgroup\noexpand\setcolorgrey{\grey}}%
+	\edef\@{\endgroup\noexpand\Colorgrey{\grey}}%
 	\@\ignorespaces}
-
-\fi % PDFTeX
 
 \catcode`\@=12
 \endinput
