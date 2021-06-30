@@ -55,9 +55,6 @@
 
 \def\gobble#1{}
 \def\gobbleto#1{\begingroup\def\@gobble##1#1{\endgroup}\@gobble}
-% TODO: these are weird: remove them
-\def\1#1#2{#1} % I.e., firstoftwo
-\def\2#1#2{#2} % I.e., secondoftwo
 
 \def\@END{\errmessage{this should not execute!}}
 \def\@@END{\@END}
@@ -632,31 +629,9 @@
 \def\mvstrut#1{\vcenter{\hrule width0pt height#1}}
 \def\mhstrut#1{\vcenter{\hrule width#1 height0pt}}
 
-% TODO this is weird; get rid of it.
-% mappalette is like mathpalette, except instead of the first argument to the
-% given CS being the current math style, it is whatever the given mapfour maps
-% the current math style to.
-\def\mapfour#1#2#3#4#5{\ifcase #5 #1\or #2\or #3\or #4\fi}
-\def\mappalette#1#2#3{\mathchoice
-	{\edef\@arg{#10}\ea#2\ea{\@arg}{#3}}{\edef\@arg{#11}\ea#2\ea{\@arg}{#3}}
-	{\edef\@arg{#12}\ea#2\ea{\@arg}{#3}}{\edef\@arg{#13}\ea#2\ea{\@arg}{#3}}}
-
-% TODO: remove/replace with ooalign
-% Superimposition
-% This was mostly an excercise. This would probably
-% be better done with alignment macros like ooalign.
-\def\supimp#1#2{{%
-	\leavevmode
-	\setbox1=\hbox{#1}\setbox2=\hbox{#2}%
-	\ifdim\wd1<\wd2
-		\setbox0=\box1 \setbox1=\box2 \setbox2=\box0
-	\fi
-	\hbox to \wd1{\hfil\unhbox2\hfil}\llap{\unhbox1}}}
-\def\@msupimpinternal#1#2{%
-	\supimp{$\mathsurround=0pt \1#1\1#2$}{$\mathsurround=0pt \2#1\2#2$}}
-\def\msupimpmap#1#2#3{\mappalette{#1}\@msupimpinternal{{#2}{#3}}}
-\def\msupimp{\msupimpmap
-	{\mapfour{\dsty\dsty}{\tsty\tsty}{\ssty\ssty}{\sssty\sssty}}}
+\def\@supimp#1#2{\leavevmode\vtop{\baselineskip0pt \lineskiplimit-\maxdimen
+	\ialign{\hfil$#1{##}$\hfil\cr #2\crcr}}}
+\def\supimp{\mathpalette\@supimp}
 
 % Boxed computer-sciency arrays and matrices
 % Example usage (in math mode):
