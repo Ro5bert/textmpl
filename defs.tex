@@ -41,7 +41,11 @@
 
 \def\supershowlists{\par
 	{\showboxdepth=1000 \showboxbreadth=1000000 \showlists}}
-\def\vruletest{\smash{\vrule height\vsize depth\vsize}}
+\newdimen\testthickness  \testthickness=.2pt
+\def\vrtest{\rlap{\Cred\smash{\vrule width\testthickness height12in depth12in}}}
+\def\vltest{\llap{\Cred\smash{\vrule width\testthickness height12in depth12in}}}
+\def\hutest{\clap{\vbox to0pt{\Cred\vss\hrule width12in height\testthickness}}}
+\def\hbtest{\clap{\vbox to0pt{\Cred\hrule width12in height\testthickness\vss}}}
 
 
 %%% UTIL %%%
