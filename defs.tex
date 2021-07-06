@@ -143,7 +143,7 @@
 % \savethe restores the current value of the given \the-expandable "variable"
 % (e.g., a register) at the end of the current group. This allows one to
 % modify a variable globally, yet still have it's value be restored.
-\def\savethe#1{\ea\defer\ea{\ea#1\the#1}}
+\def\savethe#1{\ea\defer\ea{\ea#1\the#1\relax}}
 
 % \saveif is like \savethe, but for boolean variables defined via \newif.
 \def\saveif#1{%
