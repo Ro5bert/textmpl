@@ -110,13 +110,13 @@
 % Strip "pt" off the end of \the\dimenX. Argument must be fully expanded.
 {\catcode`\p=12 \catcode`\t=12 \gdef\@#1pt{#1}}
 \let\@strippt=\@ \let\@=\@undefined
-\def\@dimnum#1{\ea\@strippt\the#1}
+\def\decimal{\ea\@strippt\the}
 
 % Convert 4 digit hex number #2#3#4#5 to decimal in range [0,1) and store
 % it in #1.
 \newdimen\@htddimen
 \def\@hextodec#1#2#3#4#5{%
-	\@htddimen="#2#3#4#5sp \edef#1{\ea\@strippt\the\@htddimen}}
+	\@htddimen="#2#3#4#5sp \edef#1{\decimal\@htddimen}}
 
 % Get the maximum/minimum width of the material produced by each macro
 % argument among #2 and assign it to #1.
@@ -204,8 +204,11 @@
 % style switch macros are updated appropriately. In any case, see FScm.tex for
 % examples.
 
+% TODO: Make @Fload properly name the font for sake of debugging box contents.
+% TODO: hook mechanism for when fonts are changed
+
 \let\newfam=\@undefined
-\def\newfam{\errmessage{Don't use \noexpand\newfam with defs.tex!}}
+\def\newfam{\errmessage{Don't use \noexpand\newfam with defs.tex}}
 
 \newdimen\Fsize \newdimen\Ftsize \newdimen\Fssize \newdimen\Fsssize
 \newdimen\Fbight \newdimen\FBight \newdimen\Fbigght \newdimen\FBigght
