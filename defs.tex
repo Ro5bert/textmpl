@@ -591,6 +591,10 @@
 \def\notpreceq{\mathrel{\mathpalette\c@ncel\preceq}}
 \let\estr=\varepsilon
 
+% Plain TeX \vdots has weird space above it.
+\def\tightvdots{\vbox{\baselineskip=4pt \lineskiplimit=0pt
+	\def\.{\hbox{.}}\.\.\.}}
+
 % Sets
 \def\N{{\bb N}}
 \def\Z{{\bb Z}}
