@@ -192,7 +192,7 @@
 % smallest font will be chosen for sizes smaller than it.
 % \FSnull is a special font set that means "always use \nullfont".
 % 
-% Fonts in fonts sets may have a non-default skewchar or hyphenchar by using
+% Fonts in font sets may have a non-default skewchar or hyphenchar by using
 % \Fskew and \Fhyph. See FScm.tex for examples of how to use these macros.
 % Fonts in font sets can also be scaled using \Fscale<numerator>/<denominator>.
 % (Don't make <numerator> too big, or else you'll overflow TeX's max dimen!)
@@ -774,7 +774,8 @@
 
 %%% Color %%%
 
-\ifx\pdfoutput\@undefined
+% if (\pdfoutput undefined) OR (\pdfoutput <= 0)
+\if1\ifx\pdfoutput\@undefined 1\else\ifnum\pdfoutput>0 0\else 1\fi\fi
 	% dvips
 	\def\@colorpush#1{\special{color push #1}}
 	\def\@colorpop{\special{color pop}}
