@@ -32,6 +32,8 @@
 % TODO: \adef for active define, like in OpTeX
 % TODO: inline verb macro that works kinda like read file verb macro in that
 % it makes the delimiter some characters we'll never use
+% TODO: macros for making header, instead of using centerline, etc directly
+% TODO: table of optimal overline placements for symbols
 
 \csname input:defs.tex\endcsname
 \expandafter\let\csname input:defs.tex\endcsname=\endinput
@@ -39,19 +41,38 @@
 
 %%% DEBUGGING/TESTING %%%
 
-\def\supershowlists{\par
-	{\showboxdepth=1000 \showboxbreadth=1000000 \showlists}}
 \newdimen\testthickness  \testthickness=.2pt
 \def\vrtest{\rlap{\Cred\smash{\vrule width\testthickness height12in depth12in}}}
 \def\vltest{\llap{\Cred\smash{\vrule width\testthickness height12in depth12in}}}
 \def\hutest{\clap{\vbox to0pt{\Cred\vss\hrule width12in height\testthickness}}}
 \def\hbtest{\clap{\vbox to0pt{\Cred\hrule width12in height\testthickness\vss}}}
 
+\showboxdepth=8
+\showboxbreadth=256
+
 
 %%% UTIL %%%
 
-% Shortcut---long chains of expandafters can be a lot of characters.
 \let\ea=\expandafter
+
+\let\begcs=\csname
+\let\endcs=\endcsname
+\def\cs#1{\begcs#1\endcs}
+
+\protected\def\csdef#1{\ea\def\begcs#1\endcs}
+\protected\def\ecsdef#1{\ea\edef\begcs#1\endcs}
+\protected\def\gcsdef#1{\ea\gdef\begcs#1\endcs}
+\protected\def\xcsdef#1{\ea\xdef\begcs#1\endcs}
+\protected\def\undef#1{\let#1\@undefined}
+\protected\def\gundef#1{\glet#1\@undefined}
+
+\protected\def\glet{\global\let}
+\protected\def\cslet#1{\ea\let\begcs#1\endcs}
+\protected\def\gcslet#1{\ea\glet\begcs#1\endcs}
+\protected\def\letcs#1#2{\ea\let\ea#1\begcs#2\endcs}
+\protected\def\gletcs#1#2{\ea\glet\ea#1\begcs#2\endcs}
+\protected\def\csletcs#1#2{\ea\let\begcs#1\ea\endcs\begcs#2\endcs}
+\protected\def\gcsletcs#1#2{\ea\glet\begcs#1\ea\endcs\begcs#2\endcs}
 
 \def\gobble#1{}
 \def\gobbleto#1{\begingroup\def\@gobble##1#1{\endgroup}\@gobble}
@@ -266,6 +287,7 @@
 \def\Fupdfonts{\@dimen=\Fsize
 	\Ffind\rmset \let\rmfont=\Ffont
 	\Ffind\miset \let\mifont=\Ffont
+	\Ffind\exset \let\exfont=\Ffont
 	\Ffind\itset \let\itfont=\Ffont
 	\Ffind\slset \let\slfont=\Ffont
 	\Ffind\bfset \let\bffont=\Ffont
@@ -404,6 +426,7 @@
 \def\LA{{\rm\char\Lcnt}}
 \def\Lb{$\m@th\bullet$}
 \def\nlist{\list{\Ln.}} % 1. 2. 3. ...
+\def\bnlist{\list{{\bf\number\Lcnt.}}} % ditto, but bold
 \def\rlist{\plist{\Lr}} % (i) (ii) (iii) ...
 \def\Rlist{\list{\LR.}} % I. II. III. ...
 \def\alist#1{\plist{\La}{#1}\Lcnt=96 } % (a) (b) (c) ...
@@ -416,7 +439,9 @@
 \def\Llist{\par \begingroup \Lcnt=0 \advance\Llvl1 \let\Lfmt=\empty
 	\L@firsttrue \mvskip\Ltop \noparskip}
 \def\endlist{\par \endgroup \mvskip\Lbot \noparskip}
-\def\item{\advance\Lcnt1 \@item \noindent\llap{\Lfmt}}
+\def\item{\Litem\Lfmt}
+\def\itemx#1{\Litem{#1\enspace}\ignorespaces}
+\def\Litem#1{\advance\Lcnt1 \@item \noindent\llap{#1}}
 \def\cont{\@item \noindent}
 \def\@item{\par \ifL@first \L@firstfalse \else \mvskip\Lgap \noparskip \fi
 	\hangafter=0 \hangindent=\Lind
@@ -427,6 +452,10 @@
 % instead of by parindent.
 \def\@narrowerby{\advance\leftskip\@dimen \advance\rightskip\@dimen}
 \def\narrowerby{\afterassignment\@narrowerby \@dimen=}
+
+\def\@constlineskip{\baselineskip=-1000pt
+	\lineskip=\@dimen \lineskiplimit=\maxdimen}
+\def\constlineskip{\afterassignment\@constlineskip\@dimen=}
 
 % Spread tokens in #1 by glue in #2.
 % E.g., "abcd" => "a  b  c  d".
@@ -455,6 +484,32 @@
 	\advance \rightskip by 0pt plus 3em
 	\spaceskip=0.3333em \xspaceskip=0.5em\relax}
 
+% \countdef\secno=1   \secno=0
+% \countdef\ssecno=2  \ssecno=0
+% \countdef\sssecno=3 \sssecno=0
+
+% \newskip\secskip   \secskip=\hugeskipamount
+% \newskip\ssecskip  \ssecskip=\bigskipamount
+% \newskip\sssecskip \sssecskip=\bigskipamount
+
+% \let\secfont=\bf
+% \let\ssecfont=\bf
+% \let\sssecfont=\bf
+
+% \def\secfmt#1#2{#1{\number\secno.\enspace#2}}
+% \def\ssecfmt#1#2{#1{\number\secno.\number\ssecno.\enspace#2}}
+% \def\sssecfmt#1#2{#1{\number\secno.\number\ssecno.\number\sssecno.\enspace#2}}
+
+% \def\section{\advance\secno1 \ssecno=0 \sssecno=0
+	% \@section\secskip\secfmt\secfont}
+% \def\ssection{\advance\ssecno1 \sssecno=0
+	% \@section\ssecskip\ssecfmt\ssecfont}
+% \def\sssection{\advance\sssecno1
+	% \@section\sssecskip\sssecfmt\sssecfont}
+% \def\@section#1#2#3#4\par{%
+	% \vskip0pt plus.3\vsize \penalty-250 \vskip0pt plus-.3\vsize
+	% \vskip#1\vskip\parskip\leftline{#2{#3}{#4}}\nobreak\smallskip}
+
 % Units are chunks of vertical material separated by vertical space.
 % The first thing in a unit is a paragraph of form "Title.\enspace Text...".
 \newskip\@unitskip
@@ -472,7 +527,7 @@
 % Theorems+proof, lemmas+proof, definitions, etc.
 % Plain TeX proclaim has been modified to use medunit.
 \def\proclaim #1. #2\par{\par
-	\mpenalty-100 \medunit{\def\(##1){{\rm(##1)}}\bf#1}.
+	\mpenalty-100 \medunit{\def\(##1){{\rm(##1)}}\def\[##1]{{\rm[##1]}}\bf#1}.
 	\sl#2\mpenalty55 \endunit}
 \def\Proclaim #1. #2\par{\proclaim{#1}. \rm#2\par}
 \def\proof{\medunit\it Proof. }
@@ -493,6 +548,84 @@
 \else
 	\def\pdfimg#1file #2.pdf{\pdfximage#1{#2.pdf}\pdfrefximage\pdflastximage}
 \fi
+
+\newdimen\szu \newdimen\szd \newdimen\szl \newdimen\szr
+\def\@sz{\szd=\szu \szl=\szu \szr=\szu} \def\sz{\afterassignment\@sz   \szu}
+\def\@szv{\szd=\szu}                    \def\szv{\afterassignment\@szv \szu}
+\def\@szh{\szr=\szl}                    \def\szh{\afterassignment\@szh \szl}
+\def\padbox#1{\hbox{\kern\szl
+	\vbox{\kern\szu\vtop{\hbox{\sz0pt{#1}}\kern\szd}}%
+	\kern\szr}\sz0pt }
+\def\rulebox#1{\hbox{\vrule width\szl
+	\vbox{\hrule height\szu\vtop{\hbox{\sz0pt{#1}}\hrule height\szd}}%
+	\vrule width\szr}\sz0pt }
+\def\bgbox#1#2{\hbox{\setbox0=\hbox{#2}%
+	\rlap{#1\vrule width\wd0 height\ht0 depth\dp0}\box0}}
+\def\@rect{\box\@box}
+\def\rect#1*#2*{\setbox\@box=\null \wd\@box=#1\relax \ht\@box=#2\relax
+	\afterassignment\@rect \dp\@box=}
+
+\def\@htick#1{\hbox to\dimen0{\vrule width\ticklen height#1\hss
+	\vrule width\ticklen height#1}}
+\def\@vtick#1{\vrule width#1depth\dimen1 \kern-#1\vrule width#1height\dimen2 }
+\def\tickbox#1{\hbox{\setbox\@box=\hbox{\sz0pt{#1}}\dimen0\wd\@box
+	\dimen1-\ht\@box \advance\dimen1by\ticklen
+	\dimen2-\dp\@box \advance\dimen2by\ticklen
+	\@vtick\szl \vbox{\offinterlineskip\@htick\szu\vtop{\box\@box\@htick\szd}}%
+	\@vtick\szr}\sz0pt }
+
+\newdimen\Bhu \newdimen\Bvu
+\newdimen\Bld \newdimen\Brd \newdimen\Bud \newdimen\Bdd
+\newdimen\Bhs \newdimen\Bvs
+\newcount\Bhn \newcount\Bvn
+\dimendef\@Bw0 \dimendef\@Bh1 \dimendef\@Bd2
+\newdimen\ticklen \ticklen=3pt
+
+\def\Bdecrules#1{\szl\Bld \szr\Brd \szu\Bud \szd\Bdd \rulebox{#1}}
+\def\Bdecticks#1{\szl\Bld \szr\Brd \szu\Bud \szd\Bdd \tickbox{#1}}
+\def\Bdecpad#1{\szl\Bld \szr\Brd \szu\Bud \szd\Bdd \padbox{#1}}
+\let\Bdecorate=\Bdecrules
+
+\def\@Bhcalc{\@dimen\Bld \advance\@dimen\Bhs \advance\@dimen\Brd
+	\@Bw\Bhu \advance\@Bw\@dimen \multiply\@Bw\Bhn \advance\@Bw-\@dimen}
+\def\@Bvcalc{\@dimen\Bud \advance\@dimen\Bvs \advance\@dimen\Bdd
+	\@@dimen\Bvu \advance\@@dimen\@dimen \multiply\@@dimen\Bvn
+	\advance\@@dimen-\@dimen \divide\@@dimen2
+	\@Bh\@@dimen \advance\@Bh+.2\normalbaselineskip
+	\@Bd\@@dimen \advance\@Bd-.2\normalbaselineskip}
+\def\Bdstrut{{\@Bvcalc \advance\@Bh\Bud \advance\@Bd\Bdd
+	\vrule width0pt height\@Bh depth\@Bd}}
+\def\Bstrut{{\@Bvcalc \vrule width0pt height\@Bh depth\@Bd}}
+\def\Bpad#1{{\@Bhcalc \hbox to\@Bw{\hss\Bstrut\smash{#1}\hss}}}
+\def\Bbox#1{\Bdecorate{\Bpad{\normalbaselines#1}}}
+\def\Btmpl#1{\Bbox{$\m@th#1$}}
+
+\def\Balign#1{{\@Bvcalc \advance\@Bh\Bud \vbox to\@Bh{}\nobreak\vskip-\@Bh
+	\lineskiplimit=\maxdimen \lineskip=\Bvs \tabskip=0pt \nointerlineskip
+	\halign{\Bdstrut\Btmpl{##}&&\kern\Bhs\Bdstrut\Btmpl{##}\cr #1\crcr}}}
+\def\Bhspan#1{\mscount=#1\relax\loop\ifnum\mscount>1
+	\sp@n\advance\Bhn1 \repeat}
+\def\Bvspan#1[#2]{\smash{\vtop{\Bvn1 \@Bvcalc \advance\@Bh\Bud \kern-\@Bh
+	\Bvn#1\relax \Bbox{#2}}}}
+\def\Bnofmt#1{\omit#1\kern-\Bhs}
+
+\Bhu=20pt  \Bvu=20pt
+\Bld=.4pt  \Brd=.4pt  \Bud=.4pt  \Bdd=.4pt
+\Bhs=-.4pt \Bvs=-.4pt
+\Bhn=1     \Bvn=1
+
+\def\deferasn#1{\def\@deferasn{#1}\afterassignment\@deferasn}
+\def\edeferasn#1{\edef\@deferasn{#1}\afterassignment\@deferasn}
+\def\deferbox#1{\deferasn{\defer{#1}}}
+\def\edeferbox#1{\edeferasn{\noexpand\defer{#1}}}
+
+\def\@@@mmbox#1#2#3#4{\ifdim#1\@box#2\@dimen
+	\setbox\@box=#3to\@dimen{#4\@box}\fi \box\@box}
+\def\@@mmbox#1#2#3#4{\deferbox{\@@@mmbox#1#2#3#4}\setbox\@box=#3}
+\def\@mmbox#1#2#3#4{\deferasn{\@@mmbox#1#2#3#4}\@dimen=}
+\def\minhbox{\@mmbox\wd<\hbox\unhbox} \def\maxhbox{\@mmbox\wd>\hbox\unhbox}
+\def\minvbox{\@mmbox\ht<\vbox\unvbox} \def\maxvbox{\@mmbox\ht>\vbox\unvbox}
+\def\minvtop{\@mmbox\dp<\vtop\unvbox} \def\maxvtop{\@mmbox\dp>\vtop\unvbox}
 
 
 %%% MATH %%%
@@ -580,10 +713,23 @@
 \def\imp{\;\Longrightarrow\;}% To match \iff.
 \def\lcm{\mathop{\rm lcm}}% To match \gcd.
 
+\def\finset#1#2#3:#4\END{#1\{\,#3:{\rmfont#4}\,#2\}}
+\def\set#1{\finset{}{}#1\END}
+\def\Set#1{\finset\ml\mr#1\END}
 \def\mop#1(#2){\mathop{\rm{#1}}\ml({#2}\mr)}
 \def\GF{\mathop{\rm GF}}
 \def\Span{\mathop{\rm span}}
 \def\sgn{\mathop{\rm sgn}}
+\def\inn{\mathop{\rm inn}} % inner automorphism
+\def\Aut{\mathop{\rm Aut}} % automorphism group
+\def\id{\mathop{\rm id}} % identity map
+\def\im{\mathop{\rm im}} % image of map
+\def\stab{\mathop{\rm stab}} % stabilizer
+\def\ord{\mathop{\rm ord}\nolimits} % multiplicative order
+\def\JCF{\mathop{\rm JCF}\nolimits}
+\def\Ann{\mathop{\rm Ann}\nolimits}
+\def\divides{\mid}
+\def\notdivides{\nmid}
 \mathchardef\nmid="3A2D
 \def\rank{\mathop{\rm rank}}
 \def\mod#1{\ ({\rm mod}\,\,#1)}% \pmod not good for in-line math.
@@ -594,6 +740,15 @@
 % Plain TeX \vdots has weird space above it.
 \def\tightvdots{\vbox{\baselineskip=4pt \lineskiplimit=0pt
 	\def\.{\hbox{.}}\.\.\.}}
+\def\iddots{\mathinner{%
+	\mkern1mu
+	\raise\p@\hbox{.}%
+	\mkern2mu
+    \raise4\p@\hbox{.}%
+	\mkern2mu
+	\raise7\p@\vbox{\kern7\p@\hbox{.}}%
+	\mkern1mu
+}}
 
 % Sets
 \def\N{{\bb N}}
@@ -601,6 +756,8 @@
 \def\Q{{\bb Q}}
 \def\R{{\bb R}}
 \def\C{{\bb C}}
+\def\F{{\bb F}}
+\def\H{{\bb H}}
 \def\powset{{\sr P}}
 
 % Big O and friends
@@ -688,7 +845,7 @@
 		\vskip 0pt plus.3\vsize \penalty0 \vskip 0pt plus-.3\vsize
 	\fi
 	\ifnum\p@last<2 \nobreak\vskip\prob@topskip \fi
-	\nointerlineskip\hbox{#1}%
+	\nointerlineskip\hbox{#1}\nobreak%
 	\p@last=1 }
 \def\pstmt{%
 	\par

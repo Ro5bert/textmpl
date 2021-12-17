@@ -43,22 +43,22 @@
 \chardef\scfam="8 \chardef\ssfam="9 \chardef\bbfam="A \chardef\srfam="B
 \chardef\esfam="C \chardef\effam="D \chardef\bmfam="E
 
-\def\Ffamseta{\FScmr\FScmr\FScmr}     \let\rmset=\FScmr 
-\def\Ffamsetb{\FScmmi\FScmmi\FScmmi}  \let\miset=\FScmmi 
+\def\Ffamseta{\FScmr\FScmr\FScmr}     \let\rmset=\FScmr
+\def\Ffamsetb{\FScmmi\FScmmi\FScmmi}  \let\miset=\FScmmi
 \def\Ffamsetc{\FScmsy\FScmsy\FScmsy}
-\def\Ffamsetd{\FScmex\FScmex\FScmex}
-\def\Ffamsete{\FScmti\FSnull\FSnull}  \let\itset=\FScmti 
+\def\Ffamsetd{\FScmex\FScmex\FScmex}  \let\exset=\FScmex
+\def\Ffamsete{\FScmti\FSnull\FSnull}  \let\itset=\FScmti
 \def\Ffamsetf{\FScmsl\FSnull\FSnull}  \let\slset=\FScmsl
-\def\Ffamsetg{\FScmbx\FScmbx\FScmbx}  \let\bfset=\FScmbx 
-\def\Ffamseth{\FScmtt\FSnull\FSnull}  \let\ttset=\FScmtt 
-\def\Ffamseti{\FScmcsc\FSnull\FSnull} \let\scset=\FScmcsc 
+\def\Ffamsetg{\FScmbx\FScmbx\FScmbx}  \let\bfset=\FScmbx
+\def\Ffamseth{\FScmtt\FSnull\FSnull}  \let\ttset=\FScmtt
+\def\Ffamseti{\FScmcsc\FSnull\FSnull} \let\scset=\FScmcsc
 \def\Ffamsetj{\FScmss\FSnull\FSnull}  \let\ssset=\FScmss
 \def\FfamsetA{\FSmsbm\FSmsbm\FSmsbm}
 \def\FfamsetB{\FSrsfso\FSrsfso\FSrsfso}
 \def\FfamsetC{\FSeusm\FSeusm\FSeusm}
 \def\FfamsetD{\FSeufm\FSeufm\FSeufm}
 \def\FfamsetE{\FScmmib\FScmmib\FScmmib}
-\def\FfamsetF{\FSnull\FSnull\FSnull}
+\def\FfamsetF{\FSmsam\FSmsam\FSmsam}
 
 \mathchardef\Fbigchar="0300
 \mathchardef\FBigchar="0310
@@ -68,7 +68,7 @@
 \def\rm{\fam=\rmfam \rmfont}
 \def\mi{\fam=\mifam} \def\oldstyle{\fam=\mifam \mifont}
 \def\sy{\fam=\syfam}
-% \ex is pointless.
+\def\ex{\fam=\exfam \exfont}
 \def\it{\fam=\itfam \itfont}
 \def\sl{\fam=\slfam \slfont}
 \def\bf{\fam=\bffam \bffont}

@@ -1,1 +1,2 @@
-tmpl.log
+*.log
+*.pdf
